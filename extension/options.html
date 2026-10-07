@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Corgi Brain settings</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,800&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap');
+    :root { --orange:#24B47E; --orange-light:#1A9466; --orange-deep:#1A9466; --white:#FFFFFF; --paper:#F8F8F7; --ink:#171717; --stone:#6B6B6B; --line:#E4E4E2;
+      --display:"Archivo","Archivo Black","Arial Black",sans-serif; --body:"Onest",-apple-system,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.55 var(--body); padding: 40px 16px; }
+    main { max-width: 560px; margin: 0 auto; display: grid; gap: 18px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 18px/1 var(--display); letter-spacing: -0.4px; }
+    .brand svg { width: 30px; height: 30px; }
+    .kicker { font: 600 11px/1 var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--stone); }
+    h1 { margin: 6px 0 0; font: 800 32px/1.1 var(--display); letter-spacing: -0.8px; }
+    .lede { color: var(--stone); margin: 0; }
+    .card { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 8px; }
+    label { font-weight: 600; }
+    input { font: 14px var(--mono); padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--white); }
+    input:focus { outline: none; border-color: var(--ink); }
+    .hint { color: var(--stone); font-size: 13px; }
+    code { font: 12px var(--mono); background: var(--paper); padding: 1px 5px; border-radius: 4px; }
+    button { justify-self: start; font: 600 14px/1 var(--body); background: var(--orange); color: var(--white); border: 0; border-radius: 8px; min-height: 44px; padding: 0 20px; cursor: pointer; }
+    button:hover { background: var(--orange-light); }
+    button:active { background: var(--orange-deep); }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .status { min-height: 1.5em; color: var(--stone); }
+    .status.ok { color: var(--ink); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand"><span style="font:800 18px/1 Archivo,Arial,sans-serif;letter-spacing:-.03em;color:#171717">🐶 Corgi <b style="color:#24B47E">Brain</b></span></div>
+
+    <header>
+      <div class="kicker">Settings</div>
+      <h1>Settings</h1>
+    </header>
+    <p class="lede">
+      Corgi Brain talks to a small bridge running on your machine. It holds the
+      keys, keeps the library, and sends agents to explore sites.
+    </p>
+
+    <div class="card">
+      <label for="bridgeUrl">Bridge URL</label>
+      <input type="text" id="bridgeUrl" placeholder="http://localhost:8787" autocomplete="off" />
+      <div class="hint">Leave empty to use <code>http://localhost:8787</code>.</div>
+    </div>
+
+    <button id="save" type="button">Save</button>
+    <div class="status" id="status" role="status"></div>
+  </main>
+
+  <script src="options.js"></script>
+</body>
+</html>

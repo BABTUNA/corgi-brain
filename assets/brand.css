@@ -1,0 +1,18 @@
+/* Supa Brain brand tokens. Base palette is the core Supabase colours: jade green on near-black. */
+:root {
+  --sb-green: #3ECF8E;      /* the B, "Brain" in the wordmark, primary actions, one accent per screen */
+  --sb-green-deep: #24B47E; /* green on light surfaces, pressed */
+  --sb-night: #171717;      /* page background */
+  --sb-surface: #1C1C1C;    /* cards on night */
+  --sb-border: #2E2E2E;     /* lines */
+  --sb-snow: #EDEDED;       /* text, the S */
+  --sb-white: #FFFFFF;
+  --sb-muted: #898989;      /* secondary text */
+
+  --sb-font-display: "Archivo", "Helvetica Neue", Arial, sans-serif; /* 800, normal width */
+  --sb-font-mark: "Syne", sans-serif;      /* the S and B only; never for text */
+  --sb-font-body: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --sb-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --sb-radius: 12px;
+}

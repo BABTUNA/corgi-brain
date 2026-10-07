@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Replays · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  .stats { display: flex; gap: 16px 32px; flex-wrap: wrap; }
+  .stats div { display: grid; gap: 2px; }
+  .stats b { font: 800 30px/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stats b.big { color: var(--orange-deep); }
+  .stats span { color: var(--stone); font-size: 13px; }
+  .connect { display: grid; gap: 10px; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 18px 20px; }
+  .connect h2 { color: var(--paper); }
+  .connect p { margin: 0; color: #A3A3A3; font-size: 14px; max-width: 70ch; }
+  .connect p code { overflow-wrap: anywhere; }
+  .connect pre { margin: 0; background: #0E0E0E; border: 1px solid #2E2E2E; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 500 12.5px/1.6 var(--mono); color: #EDEDED; }
+  .connect code { font-family: var(--mono); color: var(--orange-soft); }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tools span { font: 500 12px/1 var(--mono); border: 1px solid #2E2E2E; border-radius: 99px; padding: 6px 10px; color: #EDEDED; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  th { font: 600 11px/1 var(--mono); letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); white-space: nowrap; }
+  td a { text-decoration: none; font-weight: 500; }
+  td a:hover { text-decoration: underline; }
+  td.num { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pill { font: 500 11px/1 var(--mono); border-radius: 99px; padding: 4px 8px; white-space: nowrap; }
+  .pill.ok { color: var(--orange-ink); background: var(--orange-soft); }
+  .pill.bad { color: var(--red-ink); background: #FBECEA; }
+  .pill.healed { color: #6B4A00; background: #FFF3C4; }
+  .muted { color: var(--stone); }
+  .wrap { overflow-x: auto; background: var(--white); border: 1px solid var(--line); border-radius: 12px; }
+  tr.new td { animation: flash 1.6s ease-out; }
+  @keyframes flash { from { background: var(--orange-soft); } to { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { tr.new td { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  {{NAV}}
+  <header>
+    <div class="kicker">Replays</div>
+    <h1>Agents that didn't have to explore</h1>
+    <p class="lede">Every time an agent asks Corgi Brain instead of clicking around a site, the saved path runs in a headless browser in seconds, with no model calls. When a site has changed, the path heals itself and the library is updated for the next agent.</p>
+  </header>
+  <div class="stats" id="stats"></div>
+  <section class="connect">
+    <h2>Connect your agent</h2>
+    <p>Corgi Brain is an MCP server. Add it to Claude Code (it is already in this repo's <code>.mcp.json</code>) or any MCP client, and your agent looks up a verified path before it starts clicking.</p>
+    <pre>{
+  "mcpServers": {
+    "corgi-brain": { "command": "node", "args": ["mcp/server.js"] }
+  }
+}</pre>
+    <div class="tools"><span>search_workflows</span><span>get_workflow</span><span>run_workflow</span><span>explore_site</span><span>get_exploration</span><span>list_sites</span></div>
+    <p>Or over HTTP: <code>POST {{BASE}}/workflows/&lt;id&gt;/run</code></p>
+  </section>
+  <section>
+    <h2 style="margin-bottom:10px">Recent replays</h2>
+    <div class="wrap"><table>
+      <thead><tr><th>When</th><th>Workflow</th><th>Caller</th><th>Result</th><th>Took</th><th>Saved</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+    </table></div>
+  </section>
+</main>
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const dur = (s) => s >= 120 ? `${Math.round(s / 60)} min` : `${Math.round(s)} s`;
+  const ago = (t) => { const s = Math.round((Date.now() - new Date(t)) / 1000); return s < 60 ? `${s}s ago` : s < 3600 ? `${Math.round(s / 60)}m ago` : `${Math.round(s / 3600)}h ago`; };
+  let seen = new Set();
+  function render({ stats, replays }) {
+    const rate = stats.replays ? Math.round((stats.ok / stats.replays) * 100) : 0;
+    document.getElementById("stats").innerHTML = `
+      <div><b class="big">${dur(stats.savedSeconds)}</b><span>agent time saved</span></div>
+      <div><b class="big">$${stats.savedUsd.toFixed(2)}</b><span>tokens not spent</span></div>
+      <div><b>${stats.replays}</b><span>replays</span></div>
+      <div><b>${rate}%</b><span>ran clean or healed</span></div>
+      <div><b>${stats.healed}</b><span>paths healed</span></div>`;
+    document.getElementById("rows").innerHTML = replays.map((r) => {
+      const status = r.ok ? (r.healed ? '<span class="pill healed">healed</span>' : '<span class="pill ok">ran clean</span>') : `<span class="pill bad">failed at step ${esc(r.failed_at)}</span>`;
+      const isNew = seen.size && !seen.has(r.id);
+      return `<tr class="${isNew ? "new" : ""}"><td class="num muted">${ago(r.at)}</td><td><a href="/guide/${esc(r.workflow_id)}">${esc(r.workflow_id)}</a>${r.reason && !r.ok ? `<div class="muted" style="font-size:12px">${esc(r.reason)}</div>` : ""}</td><td class="muted">${esc(r.caller)}</td><td>${status}</td><td class="num">${Number(r.seconds).toFixed(1)} s</td><td class="num">${r.ok ? `${Math.round(r.saved_seconds)} s · $${Number(r.saved_usd).toFixed(3)}` : "—"}</td></tr>`;
+    }).join("") || '<tr><td colspan="6" class="muted">No replays yet. Ask your agent to run a workflow.</td></tr>';
+    seen = new Set(replays.map((r) => r.id));
+  }
+  const load = () => fetch("/replays.json").then((r) => r.json()).then(render).catch(() => {});
+  load();
+  // New replays stream in live.
+  const sb = supabase.createClient(window.SUPA.url, window.SUPA.anonKey);
+  sb.channel("replays").on("postgres_changes", { event: "INSERT", schema: "public", table: "replays" }, load).subscribe();
+  setInterval(load, 30000);
+</script>
+</body>
+</html>

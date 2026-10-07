@@ -1,0 +1,31 @@
+{
+  "id": "check-amazon-returns-policy",
+  "task": "Check Amazon returns policy",
+  "site": "amazon.com",
+  "startUrl": "https://www.amazon.com/ref=nav_logo",
+  "recordedBy": "ben",
+  "recordedAt": "2026-09-27T23:28:18.879Z",
+  "synonyms": "view return policy, check return eligibility, how to return an item, return window information",
+  "cleanedBy": "claude",
+  "rawEventCount": 4,
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click the 'Returns' link on the product page.",
+      "target": {
+        "tag": "a",
+        "text": "returns"
+      },
+      "fid": "fp:a::Returns",
+      "label": "Returns",
+      "url": "/Filling-Armrests-BeanBag-Bedroom-Reading/dp/B0D69T4YQ7/"
+    },
+    {
+      "n": 2,
+      "kind": "verify",
+      "instruction": "You land on the returns information page for the item",
+      "textIncludes": "your-returns"
+    }
+  ]
+}

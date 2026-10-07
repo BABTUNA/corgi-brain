@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TASK}} · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  body { font-size: 16px; }
+  /* Same nav width as every other page; the guide itself stays a readable column. */
+  main > :not(.nav) { max-width: 680px; }
+  .meta { color: var(--stone); margin-top: 6px; }
+  ol { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 20px 20px 20px 46px; margin: 0; display: grid; gap: 12px; }
+  li { padding-left: 4px; }
+  li::marker { font: 600 13px var(--mono); color: var(--stone); }
+  .tag { margin-left: 6px; }
+  #browser-brain-start { justify-self: start; font-size: 16px; min-height: 48px; padding: 0 22px; }
+  #status { color: var(--stone); min-height: 1.5em; margin-top: -10px; }
+  .hint { color: var(--stone); font-size: 14px; margin: 0; }
+</style>
+</head>
+<body data-workflow-id="{{ID}}" data-start-url="{{START}}">
+<main>
+  <nav class="nav">
+    <a class="brand" href="/ask" aria-label="Corgi Brain"><span class="wordmark">Corgi <b>Brain</b></span></a>
+    <a href="/ask">Ask</a>
+    <a href="/recorded">Recorded</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <span class="nav-group">Agents</span>
+    <a href="/discovered">Discovered</a>
+    <a href="/explore">Explore</a>
+    <a href="/replays">Replays</a>
+    <a href="/history">History</a>
+  </nav>
+  <header>
+    <div class="kicker">Workflow · {{SITE}}</div>
+    <h1>{{TASK}}</h1>
+    <div class="meta">{{WHO}} on {{DATE}}</div>
+  </header>
+  <ol>{{STEPS}}</ol>
+  <button id="browser-brain-start" class="btn" type="button">Start guide</button>
+  <div id="status" role="status"></div>
+  <p class="hint">This opens {{SITE}} in this tab and highlights each step. Corgi Brain never clicks for you and never reads what you type. <a href="{{BACK}}">See all workflows</a></p>
+</main>
+<script>
+  // The Corgi Brain extension's content script handles the button. If nothing
+  // responds, the extension is not installed or needs a reload.
+  const status = document.getElementById("status");
+  document.getElementById("browser-brain-start").addEventListener("click", () => {
+    status.textContent = "Starting…";
+    setTimeout(() => {
+      if (status.textContent === "Starting…") status.textContent = "Corgi Brain didn't respond. Check the extension is installed and reloaded.";
+    }, 2500);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "id": "find-the-reference-page-for-the-fetch-api",
+  "task": "Find the reference page for the fetch API",
+  "site": "developer.mozilla.org",
+  "startUrl": "https://developer.mozilla.org/",
+  "taughtBy": "agent",
+  "agentCount": 3,
+  "explorationId": "find-the-reference-page-for-the-fetch-api-mulqgimy",
+  "recordedBy": "agent-1",
+  "recordedAt": "2026-09-28T21:08:07.034Z",
+  "synonyms": "",
+  "cleanedBy": "brainbase-claude-code",
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click Web APIs link in the navigation area",
+      "target": {
+        "tag": "a",
+        "text": "web apis"
+      },
+      "fid": "fp:a::Web APIs",
+      "url": "/en-US/docs/Web/API"
+    },
+    {
+      "n": 2,
+      "kind": "click",
+      "instruction": "Click Fetch API in the list of Web APIs",
+      "target": {
+        "tag": "a",
+        "text": "fetch api"
+      },
+      "fid": "fp:a::Fetch API",
+      "url": "/en-US/docs/Web/API/Fetch_API"
+    }
+  ]
+}

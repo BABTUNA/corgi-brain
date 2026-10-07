@@ -1,0 +1,42 @@
+{
+  "id": "view-return-or-cancel-an-order",
+  "task": "View return or cancel an order",
+  "site": "amazon.com",
+  "startUrl": "https://www.amazon.com/ref=nav_logo",
+  "recordedBy": "maya",
+  "recordedAt": "2026-09-27T22:58:55.007Z",
+  "synonyms": "cancel an Amazon order, return an item, start an order cancellation, view your returns",
+  "cleanedBy": "claude",
+  "rawEventCount": 7,
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click the product you want to return or cancel from your orders list.",
+      "target": {
+        "tag": "a",
+        "text": ""
+      },
+      "label": "Hobestluk Big Bean Bag Chairs for Adults Fireside BeanBag Couch Togo Sofa",
+      "url": "/hz/mobile/mission/"
+    },
+    {
+      "n": 2,
+      "kind": "click",
+      "instruction": "Click the \"Returns\" link on the product page to open the return/cancel options.",
+      "target": {
+        "tag": "a",
+        "text": "returns"
+      },
+      "fid": "fp:a::Returns",
+      "label": "Returns",
+      "url": "/Hobestluk-BeanBag-Fireside-Bedroom-Bluegrey/dp/B0DB28XF27/ref=pd_ci_mcx_mh_mcx_views_1_image"
+    },
+    {
+      "n": 3,
+      "kind": "verify",
+      "instruction": "You should now be on the Your Returns page where you can choose to cancel or return the item.",
+      "textIncludes": ""
+    }
+  ]
+}

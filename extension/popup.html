@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Corgi Brain</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,800&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap');
+    :root {
+      --orange: #24B47E;
+      --orange-light: #1A9466;
+      --orange-deep: #1A9466;
+      --orange-soft: #D7F5E8;
+      --white: #FFFFFF;
+      --paper: #F8F8F7;
+      --ink: #171717;
+      --stone: #6B6B6B;
+      --line: #E4E4E2;
+      --red: #D93025;
+      --display: "Archivo", "Archivo Black", "Arial Black", sans-serif;
+      --body: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      width: 360px;
+      margin: 0;
+      padding: 14px;
+      background: var(--paper);
+      color: var(--ink);
+      font: 13px/1.5 var(--body);
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      gap: 12px;
+    }
+    .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .brand img { height: 22px; width: auto; display: block; }
+    .host { font: 500 11px/1 var(--mono); color: var(--stone); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .card { background: var(--white); border: 1px solid var(--line); border-radius: 12px; }
+    .user-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 8px 12px; }
+    .user-row .who { display: inline-flex; align-items: baseline; gap: 8px; }
+    .user-badge { font: 600 12px/1 var(--mono); color: var(--ink); }
+    .kicker { font: 600 10px/1 var(--mono); letter-spacing: 1.6px; text-transform: uppercase; color: var(--orange); }
+
+
+    textarea {
+      width: 100%;
+      min-height: 72px;
+      padding: 12px 14px;
+      background: var(--white);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font: 13px/1.5 var(--body);
+      resize: vertical;
+    }
+    textarea::placeholder { color: var(--stone); }
+    textarea:focus { outline: none; border-color: var(--ink); }
+
+    .actions { display: flex; gap: 8px; }
+    button { font: 700 13px/1 var(--body); cursor: pointer; border-radius: 10px; min-height: 44px; }
+    button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .primary { flex: 1; background: var(--orange); color: var(--white); border: 0; padding: 0 16px; }
+    .primary:hover { background: var(--orange-light); }
+    .primary:active { background: var(--orange-deep); }
+    .primary:disabled { opacity: 0.5; cursor: wait; }
+    .secondary { background: var(--white); color: var(--ink); border: 1px solid var(--line); padding: 0 14px; }
+    .secondary:hover { border-color: var(--ink); }
+    .icon-btn { width: 44px; padding: 0; font-size: 18px; color: var(--stone); }
+    .rec-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); margin-right: 6px; transform: translateY(-1px); }
+    .small { min-height: 30px; padding: 0 10px; font-size: 12px; }
+
+    .status { font-size: 12px; color: var(--stone); min-height: 18px; }
+    .status.err { color: var(--red); }
+    .status.hit { color: var(--ink); font-weight: 500; }
+
+    .wf-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .wf-all { font: 500 12px/1 var(--body); color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+    .wf-list { display: grid; gap: 8px; max-height: 220px; overflow: auto; }
+    .wf-item { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 10px 10px 12px; }
+    .wf-item .t { font-weight: 600; font-size: 13px; line-height: 1.3; }
+    .wf-item .m { color: var(--stone); font-size: 11px; font-family: var(--mono); margin-top: 2px; }
+    .wf-empty { color: var(--stone); font-size: 12px; padding: 4px 2px; }
+
+    .options { font-size: 11px; color: var(--stone); text-decoration: none; justify-self: start; }
+    .options:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand"><span style="font:800 18px/1 Archivo,Arial,sans-serif;letter-spacing:-.03em;color:#171717">🐶 Corgi <b style="color:#24B47E">Brain</b></span></div>
+    <span class="host" id="wfSite"></span>
+  </div>
+
+  <div class="card user-row">
+    <span class="who"><span class="kicker">You are</span><span class="user-badge" id="userBadge">maya</span></span>
+    <button class="secondary small" id="switchUser" type="button">Switch</button>
+  </div>
+  <label for="task" class="kicker">What are you doing?</label>
+  <textarea id="task" placeholder="e.g. add a Codespaces secret" autofocus></textarea>
+
+  <div class="actions">
+    <button class="primary" id="go" type="button">Guide me</button>
+    <button class="secondary" id="record" type="button" title="Record how you do this, for your team"><span class="rec-dot"></span>Record</button>
+    <button class="secondary" id="discover" type="button" title="Send agents to figure out how to do this on the current site">Discover</button>
+    <button class="secondary icon-btn" id="stop" type="button" aria-label="Stop guidance" title="Stop guidance">×</button>
+  </div>
+
+  <div class="status" id="status" role="status"></div>
+
+  <section>
+    <div class="wf-head"><span class="kicker">Team workflows</span><a href="#" id="seeAll" class="wf-all">See all</a></div>
+    <div id="wfList" class="wf-list"><div class="wf-empty">Loading…</div></div>
+  </section>
+
+  <a class="options" href="#" id="openOptions">Bridge settings</a>
+
+  <script src="popup.js"></script>
+</body>
+</html>

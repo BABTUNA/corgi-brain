@@ -1,0 +1,78 @@
+<!doctype html>
+<!-- Corgi Brain architecture. Hand-laid SVG so no label ever sits on a line or a box.
+     Render: bash render.sh  (headless Chrome, writes architecture.png at 2x) -->
+<html lang="en"><head><meta charset="utf-8"><title>Corgi Brain architecture</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,800&family=Onest:wght@400;500&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  html,body{margin:0;background:#fff}
+  svg{display:block}
+  .t{font:800 21px Archivo,sans-serif;fill:#171717;letter-spacing:-.02em;text-anchor:middle}
+  .s{font:400 14px Onest,sans-serif;fill:#6B6B66;text-anchor:middle}
+  .l{font:500 13px "JetBrains Mono",monospace;fill:#6B6B66}
+  .k{font:500 12px "JetBrains Mono",monospace;letter-spacing:2px;text-transform:uppercase}
+  .box{fill:#fff;stroke:#171717;stroke-width:2}
+  .ext{fill:#F8F8F7;stroke:#898989;stroke-width:1.5;stroke-dasharray:5 5}
+  .a{stroke:#171717;stroke-width:2;fill:none}
+</style></head><body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="780" viewBox="0 0 1680 780">
+  <defs>
+    <marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#171717"/></marker>
+  </defs>
+
+  <text x="40" y="78" class="k" fill="#127A54">Corgi Brain</text>
+  <text x="40" y="112" style="font:800 30px Archivo,sans-serif;letter-spacing:-.03em" fill="#171717">Architecture</text>
+
+  <!-- who asks -->
+  <rect class="box" x="480" y="50" width="280" height="90" rx="12"/>
+  <text class="t" x="620" y="89">Chrome extension</text><text class="s" x="620" y="114">Record · Guide me</text>
+  <rect class="box" x="800" y="50" width="280" height="90" rx="12"/>
+  <text class="t" x="940" y="89">Web app</text><text class="s" x="940" y="114">Ask room · Explore · Replays</text>
+  <rect class="ext" x="1240" y="50" width="360" height="90" rx="12"/>
+  <text class="t" x="1420" y="89">Claude.ai · Claude Code</text><text class="s" x="1420" y="114">or any MCP client</text>
+
+  <!-- Supabase -->
+  <rect x="440" y="220" width="1200" height="500" rx="18" fill="#EFFBF5" stroke="#3ECF8E" stroke-width="2"/>
+  <text x="1616" y="700" class="k" fill="#127A54" text-anchor="end">Supabase</text>
+
+  <rect x="480" y="280" width="600" height="180" rx="12" fill="#3ECF8E" stroke="#171717" stroke-width="2"/>
+  <text class="t" x="780" y="345" style="font-size:26px">Bridge</text>
+  <text class="s" x="780" y="375" style="fill:#171717">Compute · the app, API and headless Chromium</text>
+  <text class="s" x="780" y="403" style="fill:#171717;font-weight:500">explorer agents · judge · replay · self-heal</text>
+
+  <rect class="box" x="1240" y="320" width="360" height="100" rx="12"/>
+  <text class="t" x="1420" y="364">MCP server</text><text class="s" x="1420" y="389">Edge Function</text>
+
+  <rect class="box" x="480" y="580" width="160" height="90" rx="12"/>
+  <text class="t" x="560" y="620">Storage</text><text class="s" x="560" y="644">screenshots</text>
+  <rect class="box" x="660" y="580" width="160" height="90" rx="12"/>
+  <text class="t" x="740" y="620">Realtime</text><text class="s" x="740" y="644">chat · races</text>
+  <rect class="box" x="840" y="580" width="160" height="90" rx="12"/>
+  <text class="t" x="920" y="620">embed</text><text class="s" x="920" y="644">Edge Function</text>
+  <rect class="box" x="1020" y="580" width="380" height="90" rx="12"/>
+  <text class="t" x="1210" y="620">Postgres + pgvector</text><text class="s" x="1210" y="644">workflows · races · replays · Ask room</text>
+  <rect class="box" x="1430" y="580" width="170" height="90" rx="12"/>
+  <text class="t" x="1515" y="620">Auth</text><text class="s" x="1515" y="644">OAuth 2.1 · RLS</text>
+
+  <!-- outside -->
+  <rect class="ext" x="40" y="285" width="260" height="76" rx="12"/>
+  <text class="t" x="170" y="318">Claude API</text><text class="s" x="170" y="342">Sonnet 5.5 · Opus 5.5 judge</text>
+  <rect class="ext" x="40" y="381" width="260" height="76" rx="12"/>
+  <text class="t" x="170" y="414">Public websites</text><text class="s" x="170" y="438">no logins, no bot-wall fights</text>
+
+  <!-- arrows -->
+  <path class="a" d="M620 140V280" marker-start="url(#h)" marker-end="url(#h)"/><text class="l" x="632" y="186">record · guide</text>
+  <path class="a" d="M940 140V280" marker-end="url(#h)"/><text class="l" x="952" y="186">ask · explore · run</text>
+  <path class="a" d="M1420 140V320" marker-end="url(#h)"/><text class="l" x="1432" y="186">MCP tools</text>
+
+  <path class="a" d="M1240 370H1080" marker-end="url(#h)"/><text class="l" x="1160" y="358" text-anchor="middle">ask · run</text>
+  <path class="a" d="M480 323H300" marker-end="url(#h)"/><text class="l" x="370" y="311" text-anchor="middle">prompts</text>
+  <path class="a" d="M480 419H300" marker-end="url(#h)"/><text class="l" x="370" y="407" text-anchor="middle">browsers</text>
+
+  <path class="a" d="M560 460V580" marker-end="url(#h)"/><text class="l" x="572" y="525">frames</text>
+  <path class="a" d="M740 460V580" marker-end="url(#h)"/><text class="l" x="752" y="525">live updates</text>
+  <path class="a" d="M920 460V580" marker-end="url(#h)"/><text class="l" x="932" y="525">embed text</text>
+  <path class="a" d="M1050 460V580" marker-start="url(#h)" marker-end="url(#h)"/><text class="l" x="1062" y="525">workflows</text>
+  <path class="a" d="M1320 420V580" marker-end="url(#h)"/><text class="l" x="1308" y="505" text-anchor="end">search as the user</text>
+  <path class="a" d="M1515 420V580" marker-end="url(#h)"/><text class="l" x="1503" y="505" text-anchor="end">sign-in</text>
+</svg>
+</body></html>

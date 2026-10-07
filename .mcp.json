@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "corgi-brain": {
+      "command": "node",
+      "args": ["mcp/server.js"]
+    }
+  }
+}

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  .lede { max-width: 940px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+  aside { display: grid; gap: 14px; position: sticky; top: 16px; }
+  .panel { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 4px; max-height: 44vh; overflow-y: auto; }
+  .panel h2 { font-size: 15px; display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 0 0 8px; }
+  .panel h2 small { font: 600 11px/1 var(--mono); color: var(--orange-ink); background: var(--orange-soft); border-radius: 99px; padding: 4px 8px; min-width: 22px; text-align: center; }
+  .panel h2 small:empty { display: none; }
+  .news { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.55; }
+  .news:last-child { padding-bottom: 0; }
+  .news:first-child { border-top: 0; padding-top: 2px; }
+  .news .when { font: 500 11.5px/1.4 var(--mono); color: var(--stone); display: flex; gap: 10px; align-items: center; margin-top: 2px; flex-wrap: wrap; }
+  .news .kind { font: 600 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--orange-ink); }
+  .news .kind.healed { color: #9A6B00; }
+  .news a { font: 600 12px var(--body); color: var(--orange-ink); text-decoration: none; }
+  .news a:hover { text-decoration: underline; }
+  .empty-note { color: var(--stone); font-size: 13px; margin: 0; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } aside { position: static; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; } }
+  /* The room: one card with the thread on top and the composer docked underneath. */
+  .chat { display: grid; min-width: 0; background: var(--white); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .room-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+  .room-name { font: 700 14px/1.2 var(--body); display: flex; align-items: center; gap: 8px; }
+  .room-name::before { content: "#"; font: 600 14px/1 var(--mono); color: var(--stone); }
+  .live { font: 600 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--orange-ink); background: var(--orange-soft); border-radius: 99px; padding: 5px 9px; }
+  .live:empty { display: none; }
+  .room { display: grid; gap: 16px; align-content: start; padding: 20px 18px; min-height: 340px; max-height: max(340px, min(64vh, calc(100svh - 470px))); overflow-y: auto; scroll-behavior: smooth; }
+  .room > .muted { margin: 0; }
+  .msg { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .msg.question:not(:first-child) { margin-top: 6px; padding-top: 20px; border-top: 1px dashed var(--line); }
+  .av { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font: 700 13px/1 var(--mono); background: var(--line); color: var(--ink); }
+  .av.brain { background: var(--ink); color: #3ECF8E; }
+  .av.agent { background: var(--orange-soft); color: var(--orange-ink); }
+  .who { font: 600 13px/1.2 var(--body); display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .who .tag { font: 600 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 3px 6px; border: 0; border-radius: 99px; background: var(--line); color: var(--stone); }
+  .who .tag.agent { background: var(--orange-soft); color: var(--orange-ink); }
+  .who time { font: 400 12px var(--body); color: var(--stone); }
+  .body { margin-top: 4px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; text-wrap: pretty; }
+  .msg.question .body { font-weight: 500; }
+  .msg.announcement .body { color: var(--stone); font-size: 14px; }
+  .msg.announcement .av { background: var(--orange-soft); color: var(--orange-ink); }
+  .msg.request .body::before { content: "Recording requested: "; font-weight: 600; color: var(--ink); }
+  .cards { display: grid; gap: 10px; margin-top: 10px; }
+  .wcard { border: 1px solid var(--line); border-left: 3px solid var(--orange); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; background: var(--paper); }
+  .wcard .t { font: 700 15px/1.3 var(--body); }
+  .wcard .m { font: 500 12px/1.4 var(--mono); color: var(--stone); }
+  .wcard ol { margin: 4px 0 0; padding-left: 20px; font-size: 14px; display: grid; gap: 3px; }
+  .wcard li::marker { font: 600 12px var(--mono); color: var(--stone); }
+  .wcard .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .wcard .acts .btn, .gap .btn { min-height: 36px; padding: 0 14px; font-size: 13px; }
+  .run-out { font: 500 12px/1.4 var(--mono); color: var(--stone); flex-basis: 100%; }
+  .run-out:empty { display: none; }
+  .run-out.ok { color: var(--orange-ink); }
+  .gap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .thinking .body { color: var(--stone); font-style: italic; }
+  .thinking .body::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 8px; border-radius: 50%; background: var(--orange); vertical-align: middle; animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+  @media (prefers-reduced-motion: reduce) { .thinking .body::after { animation: none; } }
+  .compose { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 12px; border-top: 1px solid var(--line); background: var(--paper); }
+  .compose input { font: 15px var(--body); color: var(--ink); padding: 12px 14px; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); min-width: 0; width: 100%; }
+  .compose input:hover { border-color: #CFCFCC; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chips-label { font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--stone); margin-right: 2px; }
+  .chip { font: 500 13px/1.2 var(--body); text-align: left; background: var(--white); border: 1px solid var(--line); border-radius: 99px; padding: 7px 12px; min-height: 34px; cursor: pointer; color: var(--ink); transition: border-color .15s, background-color .15s; }
+  .chip:hover { border-color: var(--orange-deep); background: var(--orange-soft); }
+  @media (max-width: 640px) {
+    .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 4px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { white-space: nowrap; flex: none; }
+    .room { padding: 16px 14px; max-height: 72svh; min-height: 320px; }
+    .room-head { padding: 12px 14px; }
+    .msg { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
+    .av { width: 30px; height: 30px; border-radius: 8px; font-size: 11px; }
+    .wcard { padding: 12px 12px 12px 14px; }
+    .compose { padding: 10px; }
+  }
+  .skill { font: 500 13px/1.2 var(--body); color: var(--orange-ink, #127A54); text-decoration: underline; text-underline-offset: 3px; }
+  .skill::before { content: "✳ "; display: inline-block; margin-right: 2px; }
+  .skill:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  {{NAV}}
+  <header>
+    <div class="kicker">Ask</div>
+    <h1>How does your team do it?</h1>
+    <p class="lede">One room for your org's know-how in every web app. Ask how to do something and Corgi Brain answers from what teammates recorded and agents discovered, with steps you can follow or run. Agents ask here too, over MCP.</p>
+  </header>
+  <div class="chips" id="chips" role="group" aria-label="Example questions">
+    <span class="chips-label" aria-hidden="true">Try</span>
+    <button type="button" class="chip">How do I add a secret for Codespaces?</button>
+    <button type="button" class="chip">How do I send back something I bought on Amazon?</button>
+    <button type="button" class="chip">Where do I get Python for my Mac?</button>
+    <button type="button" class="chip">How do I rotate our Stripe API keys?</button>
+  </div>
+  <div class="layout">
+    <div class="chat">
+      <div class="room-head"><span class="room-name">team</span><span class="live" id="live"></span></div>
+      <section class="room" id="room" aria-live="polite" aria-label="Team room"><p class="muted">Loading the room…</p></section>
+      <form class="compose" id="compose">
+        <input id="q" placeholder="Ask: how do I…" aria-label="Your question" maxlength="500" autocomplete="off" required>
+        <button class="btn" type="submit">Ask</button>
+      </form>
+    </div>
+    <aside>
+      <section class="panel" aria-labelledby="news-h"><h2 id="news-h">New in the brain <small id="news-n"></small></h2><div id="news"><p class="empty-note">Nothing new yet. Recordings, agent discoveries and healed paths show up here.</p></div></section>
+      <section class="panel" aria-labelledby="wanted-h"><h2 id="wanted-h">Wanted: please record <small id="wanted-n"></small></h2><div id="wanted"><p class="empty-note">No requests. When the brain can't answer, ask a teammate to record it and it lands here.</p></div></section>
+    </aside>
+  </div>
+</main>
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const BASE = location.pathname.replace(/\/ask\/?$/, "");
+  const room = $("room");
+  const shown = new Set();
+  let pending = null;
+
+  const time = (t) => new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const initials = (m) => m.author_kind === "brain" ? "SB" : m.author_kind === "agent" ? "AI" : esc(m.author.trim().slice(0, 2).toUpperCase() || "?");
+
+  function cardHtml(c) {
+    return `<div class="wcard" data-id="${esc(c.id)}">
+      <div class="t">${esc(c.task)}</div>
+      <div class="m">${esc(c.site)} · ${esc(c.who)}${c.cleanedFrom ? ` · cleaned from ${esc(c.cleanedFrom)} clicks` : ""}${c.healed ? " · healed" : ""}</div>
+      <ol>${c.steps.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
+      <div class="acts">
+        <a class="btn" href="${BASE}/guide/${esc(c.id)}">Guide me</a>
+        <button class="btn secondary" type="button" data-run="${esc(c.id)}">Run it for me</button>
+        <a class="skill" href="${BASE}/workflows/${esc(c.id)}/skill.zip" download title="Download as a Claude Agent Skill (SKILL.md) for Claude.ai or Claude Code">Add to Claude as a Skill</a>
+        <span class="run-out" data-out="${esc(c.id)}"></span>
+      </div>
+    </div>`;
+  }
+
+  function msgHtml(m) {
+    const cards = (m.cards || []).length ? `<div class="cards">${m.cards.map(cardHtml).join("")}</div>` : "";
+    const ex = m.meta && m.meta.explore;
+    const gap = m.kind === "answer" && m.meta && m.meta.gap ? `<div class="gap">
+        <button class="btn secondary" type="button" data-request="${esc(m.reply_to)}">Ask a teammate to record it</button>
+        ${ex ? `<a class="btn secondary" href="${BASE}/explore?goal=${encodeURIComponent(ex.goal)}&url=${encodeURIComponent(ex.url)}">Send agents to ${esc((() => { try { return new URL(ex.url).hostname; } catch { return "the site"; } })())}</a>` : ""}
+      </div>` : "";
+    const tag = m.author_kind === "agent" ? '<span class="tag agent">agent</span>' : m.kind === "announcement" ? '<span class="tag">new in the brain</span>' : "";
+    return `<article class="msg ${esc(m.kind)}" id="m${m.id}" data-body="${esc(m.body)}">
+      <div class="av ${esc(m.author_kind)}">${initials(m)}</div>
+      <div><div class="who">${esc(m.author)} ${tag}<time>${time(m.at)}</time></div>
+      <div class="body">${esc(m.body)}</div>${cards}${gap}</div>
+    </article>`;
+  }
+
+  // Announcements and recording requests live in the side panels; the room is only questions and answers.
+  function side(m) {
+    const box = $(m.kind === "request" ? "wanted" : "news");
+    box.querySelector(".empty-note")?.remove();
+    const c = (m.cards || [])[0];
+    const what = m.meta && m.meta.what;
+    const html = m.kind === "request"
+      ? `<div class="news"><span class="when">${time(m.at)} · asked by ${esc(m.author)}</span><span>${esc(m.body)}</span></div>`
+      : `<div class="news"><span class="kind ${what === "healed" ? "healed" : ""}">${esc(what === "keeper" ? "nightly check · Agent37" : what === "healed" ? "healed" : what === "discovered" ? "agents found" : "recorded")}</span><span>${esc(m.body)}</span><span class="when"><span>${time(m.at)}</span>${c ? `<a href="${BASE}/guide/${esc(c.id)}">Guide me →</a>` : ""}</span></div>`;
+    box.insertAdjacentHTML("afterbegin", html);
+    $(m.kind === "request" ? "wanted-n" : "news-n").textContent = String(box.querySelectorAll(".news").length);
+  }
+
+  function add(m) {
+    if (shown.has(m.id)) return;
+    shown.add(m.id);
+    if (m.kind === "announcement" || m.kind === "request") return side(m);
+    if (room.querySelector(".muted")) room.innerHTML = "";
+    if (m.kind === "answer" && pending && pending.dataset.for == m.reply_to) { pending.remove(); pending = null; }
+    room.insertAdjacentHTML("beforeend", msgHtml(m));
+    room.scrollTop = room.scrollHeight;
+  }
+
+  function thinking(qid) {
+    pending?.remove();
+    room.insertAdjacentHTML("beforeend", `<article class="msg thinking" data-for="${qid}"><div class="av brain">SB</div><div><div class="who">Corgi Brain</div><div class="body">Searching what the team knows…</div></div></article>`);
+    pending = room.lastElementChild;
+    room.scrollTop = room.scrollHeight;
+  }
+
+  const sb = supabase.createClient(window.SUPA.url, window.SUPA.anonKey);
+  async function load() {
+    const { data, error } = await sb.from("messages").select("*").eq("room", "team").order("id", { ascending: false }).limit(60);
+    if (error) { room.innerHTML = `<p class="muted">Could not load the room: ${esc(error.message)}</p>`; return; }
+    room.innerHTML = data.length ? "" : '<p class="muted">Nobody has asked anything yet. Try one of the questions above.</p>';
+    data.reverse().forEach(add);
+    // Open on the latest message (smooth scrolling would stop partway while 60 rows render).
+    room.style.scrollBehavior = "auto"; room.scrollTop = room.scrollHeight; room.style.scrollBehavior = "";
+  }
+  load().then(() => {
+    sb.channel("room:team")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "room=eq.team" }, (msg) => add(msg.new))
+      .subscribe((s) => { $("live").textContent = s === "SUBSCRIBED" ? "● live" : ""; });
+  });
+
+  async function send(question) {
+    const author = "teammate";
+    $("q").value = "";
+    const r = await fetch(`${BASE}/ask`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question, author }) })
+      .then((r) => r.json()).catch((err) => ({ error: err.message }));
+    if (r.error) { pending?.remove(); pending = null; alert(`Corgi Brain couldn't answer: ${r.error}`); return; }
+    add(r.question); add(r.answer);
+  }
+
+  $("compose").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const q = $("q").value.trim();
+    if (!q) return;
+    // Show the question and a thinking row at once; Realtime brings the stored versions.
+    thinking("pending");
+    send(q);
+  });
+  // Realtime delivers the question first; tie the thinking row to it.
+  const origAdd = add;
+  add = (m) => { if (m.kind === "question" && pending && pending.dataset.for === "pending") { origAdd(m); pending.dataset.for = String(m.id); room.appendChild(pending); return; } origAdd(m); };
+  $("chips").addEventListener("click", (e) => { if (e.target.matches(".chip")) { $("q").value = e.target.textContent; $("compose").requestSubmit(); } });
+
+  room.addEventListener("click", async (e) => {
+    const run = e.target.closest("[data-run]");
+    if (run) {
+      const id = run.dataset.run, out = room.querySelectorAll(`[data-out="${CSS.escape(id)}"]`);
+      run.disabled = true; out.forEach((o) => { o.className = "run-out"; o.textContent = "Running in a headless browser…"; });
+      const r = await fetch(`${BASE}/workflows/${encodeURIComponent(id)}/run`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ caller: "ask room" }) }).then((r) => r.json()).catch((err) => ({ error: err.message }));
+      run.disabled = false;
+      out.forEach((o) => {
+        if (r.error) { o.textContent = r.error; return; }
+        o.className = `run-out ${r.ok ? "ok" : ""}`;
+        o.textContent = r.ok ? `Done in ${r.seconds}s${r.healed ? " (healed a broken step)" : ""} · ended on ${r.title || r.finalUrl} · saved ${r.saved.seconds}s and $${r.saved.usd.toFixed(3)}` : `Stopped at step ${r.failedAt}: ${r.reason}`;
+      });
+      return;
+    }
+    const req = e.target.closest("[data-request]");
+    if (req) {
+      const q = document.getElementById(`m${req.dataset.request}`);
+      req.disabled = true; req.textContent = "Requested";
+      await fetch(`${BASE}/ask/request`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ task: q ? q.dataset.body : "this", author: "teammate" }) });
+    }
+  });
+</script>
+</body>
+</html>

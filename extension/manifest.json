@@ -1,0 +1,68 @@
+{
+  "manifest_version": 3,
+  "name": "Corgi Brain",
+  "version": "1.0.0",
+  "description": "Record how you do something on a website, or let agents discover it. Get guided through it in your own browser.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://*.amazon.com/*",
+    "https://console.aws.amazon.com/*",
+    "https://*.console.aws.amazon.com/*",
+    "https://claude.ai/*",
+    "https://*.claude.ai/*",
+    "https://www.anthropic.com/*",
+    "https://anthropic.com/*",
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Corgi Brain",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "overlay.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "overlay.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

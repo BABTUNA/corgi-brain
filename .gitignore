@@ -1,0 +1,24 @@
+# Secrets and local credentials
+.env*
+!.env.example
+.oauth-claude-client.txt
+*.key
+*.pem
+
+# Dependencies, builds and local tools
+node_modules
+.next
+.bin/
+*.crx
+*.zip
+
+# Supabase CLI state
+supabase/.temp
+supabase/.branches
+
+# OS and logs
+.DS_Store
+*.log
+.keeper.json
+bridge/.keeper.json
+.env.agent37

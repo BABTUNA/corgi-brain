@@ -1,0 +1,26 @@
+{
+  "id": "find-the-list-of-all-top-level-domains-in-the-root-zone",
+  "task": "Find the list of all top-level domains in the root zone",
+  "site": "iana.org",
+  "startUrl": "https://www.iana.org/",
+  "taughtBy": "agent",
+  "agentCount": 3,
+  "explorationId": "find-the-list-of-all-top-level-domains-in-the-root-zone-muln84el",
+  "recordedBy": "agent-2",
+  "recordedAt": "2026-09-28T19:33:37.926Z",
+  "synonyms": "",
+  "cleanedBy": "brainbase-claude-code",
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click Database of Top Level Domains",
+      "target": {
+        "tag": "a",
+        "text": "database of top level domains"
+      },
+      "fid": "fp:a::Database of Top Level Domains",
+      "url": "/domains/root/db"
+    }
+  ]
+}

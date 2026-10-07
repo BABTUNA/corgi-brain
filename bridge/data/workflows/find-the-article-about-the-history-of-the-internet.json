@@ -1,0 +1,22 @@
+{
+  "id": "find-the-article-about-the-history-of-the-internet",
+  "task": "Find the article about the history of the Internet",
+  "site": "en.wikipedia.org",
+  "startUrl": "https://en.wikipedia.org/",
+  "taughtBy": "agent",
+  "agentCount": 4,
+  "explorationId": "find-the-article-about-the-history-of-the-internet-mulqgjvg",
+  "recordedBy": "agent-1",
+  "recordedAt": "2026-09-28T21:06:58.132Z",
+  "synonyms": "",
+  "cleanedBy": "brainbase-claude-code",
+  "trail": [
+    {
+      "n": 1,
+      "kind": "fill",
+      "instruction": "Type History of the Internet into the search box",
+      "fid": "id:searchInput",
+      "url": "/wiki/History_of_the_Internet"
+    }
+  ]
+}

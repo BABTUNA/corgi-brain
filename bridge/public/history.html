@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  .stats { display: flex; gap: 16px 32px; flex-wrap: wrap; }
+  .stats div { display: grid; gap: 2px; }
+  .stats b { font: 800 30px/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stats span { color: var(--stone); font-size: 13px; }
+  .tbl { position: relative; overflow-x: auto; background: var(--white); border: 1px solid var(--line); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font: 600 11px/1 var(--mono); letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); white-space: nowrap; }
+  td.goal { min-width: 220px; }
+  td.goal a { text-decoration: none; font-weight: 500; }
+  td.goal a:hover { text-decoration: underline; }
+  td.goal .site { display: block; font: 500 12px var(--mono); color: var(--stone); margin-top: 2px; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .st { display: inline-flex; align-items: center; gap: 6px; font: 600 11px/1 var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--stone); white-space: nowrap; }
+  .st i { width: 7px; height: 7px; border-radius: 50%; background: var(--stone); }
+  .st.done { color: var(--orange-ink); } .st.done i { background: var(--orange); }
+  .st.running i { background: var(--orange); animation: pulse 1.2s infinite; }
+  .st.failed, .st.login_required, .st.blocked { color: var(--red-ink); } .st.failed i, .st.login_required i, .st.blocked i { background: var(--red); }
+  @keyframes pulse { 50% { opacity: .3; } }
+  @media (prefers-reduced-motion: reduce) { .st.running i { animation: none; } }
+  .agents { display: inline-flex; gap: 3px; }
+  .agents i { width: 10px; height: 10px; border-radius: 3px; background: var(--line); display: inline-block; }
+  .agents i.reached { background: var(--orange); }
+  .agents i.gave_up, .agents i.error, .agents i.login_required, .agents i.blocked { background: var(--red); opacity: .6; }
+  .agents i.running, .agents i.queued { background: var(--stone); opacity: .5; }
+  .ev { display: inline-flex; gap: 8px; font: 500 12px var(--mono); color: var(--stone); white-space: nowrap; }
+  .ev b { color: var(--ink); font-weight: 600; }
+  .ev .good b { color: var(--orange-ink); }
+  .ev .bad b { color: var(--red-ink); }
+  td.actions { white-space: nowrap; }
+  .actions a { font-size: 13px; font-weight: 500; }
+  .empty { padding: 28px; color: var(--stone); text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="nav">
+    <a class="brand" href="/ask" aria-label="Corgi Brain"><span class="wordmark">Corgi <b>Brain</b></span></a>
+    <a href="/ask">Ask</a>
+    <a href="/recorded">Recorded</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <span class="nav-group">Agents</span>
+    <a href="/discovered">Discovered</a>
+    <a href="/explore">Explore</a>
+    <a href="/replays">Replays</a>
+    <a href="/history" class="on" aria-current="page">History</a>
+  </nav>
+  <header>
+    <div class="kicker">History</div>
+    <h1>Every exploration, scored</h1>
+    <p class="lede">What the agents were sent to find, whether they found it, how long it took, and how the Claude judge rated each run.</p>
+  </header>
+  <div class="stats">
+    <div><b id="s-total">–</b><span>explorations</span></div>
+    <div><b id="s-found">–</b><span>found a path</span></div>
+    <div><b id="s-agents">–</b><span>agent runs</span></div>
+    <div><b id="s-time">–</b><span>median time to a path</span></div>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Goal</th><th>Result</th><th>Agents</th><th>Path</th><th>Time</th><th>Judge</th><th><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Actions</span></th></tr></thead>
+      <tbody id="rows"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const STATUS = { done: "path found", running: "running", failed: "no path", login_required: "login wall", blocked: "bot wall", stale: "interrupted" };
+  const mmss = (s) => s == null ? "–" : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const when = (iso) => { const d = new Date(iso); return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+  const EV = [["reached-goal", "goal", 1], ["clean-instructions", "instr", 5], ["no-wasted-actions", "direct", 5]];
+
+  function judge(ev) {
+    const parts = EV.filter(([k]) => ev[k]).map(([k, label, max]) => {
+      const v = ev[k].avg; const shown = max === 1 ? `${Math.round(v * 100)}%` : `${v}/5`;
+      const cls = max === 1 ? (v >= 0.5 ? "good" : "bad") : (v >= 4 ? "good" : v <= 2 ? "bad" : "");
+      return `<span class="${cls}">${label} <b>${shown}</b></span>`;
+    });
+    return parts.length ? `<span class="ev">${parts.join("")}</span>` : '<span class="muted">–</span>';
+  }
+
+  fetch("/explorations").then((r) => r.json()).then((list) => {
+    $("s-total").textContent = list.length;
+    const found = list.filter((x) => x.status === "done");
+    $("s-found").textContent = found.length;
+    $("s-agents").textContent = list.reduce((n, x) => n + x.agents, 0);
+    const times = found.map((x) => x.seconds).filter((s) => s != null).sort((a, b) => a - b);
+    $("s-time").textContent = times.length ? mmss(times[Math.floor(times.length / 2)]) : "–";
+    if (!list.length) { $("rows").innerHTML = '<tr><td colspan="7" class="empty">No explorations yet. <a href="/explore">Send some agents.</a></td></tr>'; return; }
+    $("rows").innerHTML = list.map((x) => {
+      const dots = Object.entries(x.outcomes).flatMap(([k, n]) => Array(n).fill(`<i class="${esc(k)}" title="${esc(k)}"></i>`)).join("");
+      const path = x.winner ? `${x.winner.steps} step${x.winner.steps === 1 ? "" : "s"}` : '<span class="muted">–</span>';
+      const act = [`<a href="/explore/${esc(x.id)}">Watch</a>`, x.winner ? `<a href="/guide/${esc(x.winner.workflowId)}">Guide me</a>` : ""].filter(Boolean).join(" · ");
+      return `<tr>
+        <td class="goal"><a href="/explore/${esc(x.id)}">${esc(x.goal[0].toUpperCase() + x.goal.slice(1))}</a><span class="site">${esc(x.site)} · ${when(x.startedAt)}</span></td>
+        <td><span class="st ${esc(x.status)}"><i></i>${STATUS[x.status] || esc(x.status)}</span></td>
+        <td><span class="agents" title="${esc(Object.entries(x.outcomes).map(([k, n]) => `${n} ${k}`).join(", "))}">${dots}</span></td>
+        <td class="num">${path}</td>
+        <td class="num">${mmss(x.seconds)}</td>
+        <td>${judge(x.evals || {})}</td>
+        <td class="actions">${act}</td>
+      </tr>`;
+    }).join("");
+  }).catch(() => { $("rows").innerHTML = '<tr><td colspan="7" class="empty">Could not load.</td></tr>'; });
+</script>
+</body>
+</html>

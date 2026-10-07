@@ -1,0 +1,59 @@
+{
+  "id": "find-the-page-that-explains-how-to-apply-for-a-new-top-level-2",
+  "task": "Find the page that explains how to apply for a new top-level domain",
+  "site": "iana.org",
+  "startUrl": "https://www.iana.org/",
+  "taughtBy": "agent",
+  "agentCount": 3,
+  "explorationId": "find-the-page-that-explains-how-to-apply-for-a-new-top-level-2-mulrl2ci",
+  "recordedBy": "agent-1",
+  "recordedAt": "2026-09-28T21:39:05.289Z",
+  "synonyms": "",
+  "cleanedBy": "brainbase-claude-code",
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click Domain Names in the top menu",
+      "target": {
+        "tag": "a",
+        "text": "domain names"
+      },
+      "fid": "fp:a::Domain Names",
+      "url": "/domains"
+    },
+    {
+      "n": 2,
+      "kind": "click",
+      "instruction": "Click The DNS Root Zone",
+      "target": {
+        "tag": "a",
+        "text": "the dns root zone the root is the upper-most part of the dns"
+      },
+      "fid": "fp:a::The DNS Root Zone The root is the upper-",
+      "url": "/domains/root"
+    },
+    {
+      "n": 3,
+      "kind": "click",
+      "instruction": "Click Instructions and Guides",
+      "target": {
+        "tag": "a",
+        "text": "instructions and guides articles covering the rules governin"
+      },
+      "fid": "fp:a::Instructions and Guides Articles coverin",
+      "url": "/domains/root/help"
+    },
+    {
+      "n": 4,
+      "kind": "click",
+      "instruction": "Click Delegating a Generic Top-Level Domain",
+      "target": {
+        "tag": "a",
+        "text": "delegating a generic top-level domain"
+      },
+      "fid": "fp:a::Delegating a Generic Top-Level Domain",
+      "url": "/help/gtld-delegation"
+    }
+  ]
+}

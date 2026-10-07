@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  .stats { display: flex; gap: 16px 32px; flex-wrap: wrap; }
+  .stats div { display: grid; gap: 2px; }
+  .stats b a, .stats span a { color: inherit; }
+  .stats b { font: 800 30px/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stats span { color: var(--stone); font-size: 13px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filters .sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+  .f { font: 500 13px/1 var(--mono); background: var(--white); color: var(--ink); border: 1px solid var(--line); border-radius: 99px; padding: 0 14px; min-height: 36px; cursor: pointer; }
+  .f:hover { border-color: var(--ink); }
+  .f.on:hover { border-color: var(--ink); }
+  .f.on { background-color: var(--ink); color: var(--white); border-color: var(--ink); }
+  .f .n { opacity: .55; margin-left: 2px; }
+  select.f { appearance: none; padding-right: 30px; max-width: 100%; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 16px) 16px, calc(100% - 11px) 16px; background-size: 5px 5px; background-repeat: no-repeat; }
+  select.f.on { background-color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .top { display: flex; justify-content: space-between; gap: 8px; font: 500 12px/1.3 var(--mono); color: var(--stone); }
+  .used { white-space: nowrap; }
+  .card { transition: border-color .15s, box-shadow .15s; }
+  .card:hover { border-color: #CFCFCC; box-shadow: 0 1px 2px rgba(23,23,23,.04), 0 4px 14px rgba(23,23,23,.05); }
+  .card h2 { font-size: 19px; line-height: 1.2; }
+  .site { color: var(--ink); }
+  .meta { color: var(--stone); font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+  details { font-size: 14px; }
+  summary { cursor: pointer; color: var(--stone); width: fit-content; }
+  summary:hover { color: var(--ink); }
+  ol { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; }
+  .judge { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ev { font: 500 11px/1 var(--mono); border: 1px solid var(--line); border-radius: 99px; padding: 4px 8px; color: var(--stone); background: var(--white); cursor: help; text-decoration: none; }
+  .ev.pass { color: var(--orange-ink); border-color: var(--orange-soft); background: var(--orange-soft); }
+  .ev.fail { color: var(--red-ink); border-color: #F5D5D1; background: #FBECEA; }
+  .ev.pending { border-style: dashed; }
+  .ev.link { cursor: pointer; border: 0; background: none; padding-left: 2px; text-decoration: underline; text-underline-offset: 2px; }
+  .ev.link:hover { color: var(--ink); }
+  .go { margin-top: auto; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .go .btn { min-height: 38px; padding: 0 16px; font-size: 13px; }
+  .skill { font: 500 13px/1.2 var(--body); color: var(--orange-ink, #127A54); text-decoration: underline; text-underline-offset: 3px; }
+  .skill::before { content: "✳ "; text-decoration: none; display: inline-block; margin-right: 2px; }
+  .skill:hover { color: var(--ink); }
+  .card > details, .card > .judge { margin-bottom: 6px; }
+  .empty { color: var(--stone); grid-column: 1 / -1; background: var(--white); border: 1px dashed var(--line); border-radius: 12px; padding: 28px; text-align: center; margin: 0; }
+  .cta { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 18px 20px; }
+  .cta h2 { color: var(--paper); }
+  .cta p { margin: 4px 0 0; color: #A3A3A3; font-size: 14px; max-width: 60ch; }
+  .cta p b { color: var(--paper); }
+  .cta .btn:not(.secondary) { background: var(--orange); color: var(--ink); }
+  .cta .btn:not(.secondary):hover { background: #3ECF8E; }
+  .cta.light { background: var(--orange-soft); color: var(--ink); }
+  .cta.light h2 { color: var(--ink); }
+  .cta.light { border: 1px solid #BFEBD7; }
+  .cta.light p { color: #2B3B33; }
+  .cta.light p b { color: var(--ink); }
+  .ask { display: flex; gap: 10px; }
+  .ask input { flex: 1; min-width: 0; width: auto; }
+  #count:empty { display: none; }
+  .card.hit { box-shadow: 0 0 0 2px var(--orange); }
+</style>
+</head>
+<body data-by="{{BY}}">
+<main>
+  {{NAV}}
+  <header>
+    <div class="kicker">{{KICKER}}</div>
+    <h1>{{H1}}</h1>
+    <p class="lede">{{LEDE}}</p>
+  </header>
+  {{CTA}}
+  <div class="stats">{{STATS}}</div>
+  <form class="ask" id="ask" role="search">
+    <input id="q" type="search" placeholder="{{PLACEHOLDER}}" aria-label="Search the library by meaning" autocomplete="off">
+    <button class="btn" type="submit">Search</button>
+  </form>
+  <div class="filters" role="group" aria-label="Filter by site">{{FILTERS}}</div>
+  <div class="muted" id="count" style="font-size:13px;margin-top:-10px" aria-live="polite"></div>
+  <section class="grid" id="grid">{{CARDS}}</section>
+</main>
+<script>
+  const state = { site: "" };
+  const apply = () => {
+    const cards = [...document.querySelectorAll(".card")];
+    for (const c of cards) c.hidden = !!state.site && c.dataset.site !== state.site;
+    const shown = cards.filter((c) => !c.hidden).length;
+    document.getElementById("count").textContent = shown === cards.length ? "" : shown ? `Showing ${shown} of ${cards.length}` : "Nothing on this site.";
+  };
+  // Search by meaning: Postgres hybrid search (full text + gte-small vectors) ranks the cards.
+  const grid = document.getElementById("grid");
+  const original = [...grid.children];
+  document.getElementById("ask").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const q = document.getElementById("q").value.trim();
+    const count = document.getElementById("count");
+    if (!q) { original.forEach((c) => { c.hidden = false; c.classList.remove("hit"); grid.appendChild(c); }); count.textContent = ""; return; }
+    count.textContent = "Searching…";
+    const hits = await fetch(`/search/all?q=${encodeURIComponent(q)}&n=6&by=${document.body.dataset.by}`).then((r) => r.ok ? r.json() : []).catch(() => []);
+    const order = hits.map((h) => h.id);
+    original.forEach((c) => { c.hidden = !order.includes(c.dataset.id); c.classList.toggle("hit", c.dataset.id === order[0]); });
+    order.forEach((id) => { const c = original.find((x) => x.dataset.id === id); if (c) grid.appendChild(c); });
+    count.textContent = hits.length ? `${hits.length} match${hits.length === 1 ? "" : "es"} for “${q}”, best first` : document.body.dataset.by === "agent" ? `No discovery matches “${q}”. Explore it?` : `No recording matches “${q}”.`;
+  });
+  const press = (group, b) => document.querySelectorAll(group).forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
+  const more = document.getElementById("more-sites");
+  document.querySelectorAll(".f[data-f]").forEach((b) => b.addEventListener("click", () => {
+    press(".f[data-f]", b);
+    if (more) { more.value = ""; more.classList.remove("on"); }
+    state.site = b.dataset.f; apply();
+  }));
+  more?.addEventListener("change", () => {
+    if (!more.value) return document.querySelector('.f[data-f=""]').click();
+    press(".f[data-f]", null);
+    more.classList.add("on");
+    state.site = more.value; apply();
+  });
+</script>
+</body>
+</html>

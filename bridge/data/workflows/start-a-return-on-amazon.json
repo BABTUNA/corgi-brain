@@ -1,0 +1,42 @@
+{
+  "id": "start-a-return-on-amazon",
+  "task": "Start a return on Amazon",
+  "site": "amazon.com",
+  "startUrl": "https://www.amazon.com/",
+  "recordedBy": "ben",
+  "recordedAt": "2026-09-27T23:16:57.515Z",
+  "synonyms": "return an item on Amazon, request a refund, send back a product, initiate Amazon return",
+  "cleanedBy": "claude",
+  "rawEventCount": 4,
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click the product you want to return.",
+      "target": {
+        "tag": "a",
+        "text": ""
+      },
+      "label": "Cansunna Bean Bag Chairs for Adults,Large Togo Chair,Comfy Bean Bag Couch",
+      "url": "/"
+    },
+    {
+      "n": 2,
+      "kind": "click",
+      "instruction": "Click the 'Returns' link on the product page.",
+      "target": {
+        "tag": "a",
+        "text": "returns"
+      },
+      "fid": "fp:a::Returns",
+      "label": "Returns",
+      "url": "/Cansunna-Beanbag-Fireside-Apartment-BLUEGREYPLUSH/dp/B0CP1SCTT3/"
+    },
+    {
+      "n": 3,
+      "kind": "verify",
+      "instruction": "You should land on the Your Returns page where you can select the reason and start the return process.",
+      "textIncludes": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "corgi-brain",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Your org's know-how for every web app, in one place people and agents can ask. Built on Supabase and Claude.",
+  "scripts": {
+    "test": "vitest run --config tests/vitest.config.js",
+    "test:watch": "vitest --config tests/vitest.config.js",
+    "bridge": "npm --prefix bridge start"
+  },
+  "devDependencies": {
+    "happy-dom": "^17.6.3",
+    "vitest": "^3.2.7"
+  }
+}

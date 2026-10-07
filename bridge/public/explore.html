@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  form { display: grid; gap: 14px; background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+  .row2 { display: flex; gap: 14px; align-items: end; flex-wrap: wrap; }
+  .agents { display: flex; gap: 6px; }
+  .agents button { font: 600 13px var(--mono); background: var(--white); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
+  .agents button:hover { border-color: var(--ink); }
+  .agents button.on { background: var(--ink); color: var(--white); border-color: var(--ink); }
+  .agents-label { font: 500 13px var(--body); color: var(--stone); }
+  .row2 .hint { flex: 1 1 260px; align-self: center; }
+  #err:empty { display: none; }
+  .hint { color: var(--stone); font-size: 13px; margin: 0; }
+  .recent { display: grid; gap: 8px; }
+  .recent a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 16px; background: var(--white); border: 1px solid var(--line); border-radius: 10px; text-decoration: none; font-size: 14px; transition: border-color .15s; }
+  .recent a > span:first-child { min-width: 0; }
+  .recent a > span:first-child::first-letter { text-transform: uppercase; }
+  .recent a:hover { border-color: var(--ink); }
+  .recent .s { font: 500 12px var(--mono); color: var(--stone); white-space: nowrap; }
+  .recent .s.done { color: var(--orange-ink); }
+  @media (max-width: 640px) { .recent a { flex-direction: column; gap: 4px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="nav">
+    <a class="brand" href="/ask" aria-label="Corgi Brain"><span class="wordmark">Corgi <b>Brain</b></span></a>
+    <a href="/ask">Ask</a>
+    <a href="/recorded">Recorded</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <span class="nav-group">Agents</span>
+    <a href="/discovered">Discovered</a>
+    <a href="/explore" class="on" aria-current="page">Explore</a>
+    <a href="/replays">Replays</a>
+    <a href="/history">History</a>
+  </nav>
+  <header>
+    <div class="kicker">Explore</div>
+    <h1>Send agents to figure out a website</h1>
+    <p class="lede">Give a goal and a public site. Several agents explore it at once, each with a different strategy. The shortest clean path becomes a workflow anyone can be guided through.</p>
+  </header>
+  <form id="f">
+    <div class="row">
+      <label>Goal<input type="text" id="goal" placeholder="find the list of all top-level domains in the root zone" required autofocus></label>
+      <label>Start at<input type="url" id="url" placeholder="https://www.iana.org/" required></label>
+    </div>
+    <div class="row2">
+      <div role="group" aria-label="Agents" style="display:grid;gap:6px"><span class="agents-label">Agents</span><span class="agents" id="agents"><button type="button" aria-pressed="false">1</button><button type="button" aria-pressed="false">2</button><button type="button" class="on" aria-pressed="true">3</button><button type="button" aria-pressed="false">4</button><button type="button" aria-pressed="false">5</button></span></div>
+      <button class="btn" id="go" type="submit">Explore</button>
+      <p class="hint">Each agent is Claude driving its own browser; you watch every step live. About a minute or two. No logins: agents stop at any sign-in wall.</p>
+    </div>
+    <div class="hint" id="err" role="alert" style="color: var(--red)"></div>
+  </form>
+  <section>
+    <div class="kicker" style="margin-bottom: 10px">Recent explorations</div>
+    <div class="recent" id="recent"><span class="muted">Loading…</span></div>
+  </section>
+</main>
+<script>
+  // Prefill from the Ask room's "Send agents" button: /explore?goal=...&url=...
+  { const q = new URLSearchParams(location.search); if (q.get("goal")) document.getElementById("goal").value = q.get("goal"); if (q.get("url")) document.getElementById("url").value = q.get("url"); }
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let agents = 3;
+  $("agents").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    $("agents").querySelectorAll("button").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
+    agents = Number(b.textContent);
+  }));
+  $("f").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("err").textContent = ""; $("go").disabled = true; $("go").textContent = "Starting…";
+    try {
+      const r = await fetch("/explore", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ goal: $("goal").value.trim(), url: $("url").value.trim(), agents }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || r.statusText || "The bridge refused the request.");
+      location.href = `/explore/${j.id}`;
+    } catch (err) {
+      $("err").textContent = err.message; $("go").disabled = false; $("go").textContent = "Explore";
+    }
+  });
+  fetch("/explorations").then((r) => r.json()).then((list) => {
+    const el = $("recent");
+    if (!list.length) { el.innerHTML = '<span class="muted">None yet. Try the example above.</span>'; return; }
+    el.innerHTML = list.slice(0, 8).map((x) => `<a href="/explore/${esc(x.id)}"><span>${esc(x.goal)} <span class="muted">· ${esc(x.site || x.url)}</span></span><span class="s ${x.status === "done" ? "done" : ""}">${esc({ done: "found a path", running: "running", failed: "no path", login_required: "login wall", blocked: "bot wall", stale: "interrupted" }[x.status] || x.status)} · ${Number(x.agents) || 0} agents</span></a>`).join("");
+  }).catch(() => { $("recent").innerHTML = '<span class="muted">Could not load.</span>'; });
+</script>
+</body>
+</html>

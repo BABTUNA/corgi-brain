@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exploring · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  .head { display: grid; gap: 6px; }
+  .status { display: inline-flex; align-items: center; gap: 8px; font: 600 12px/1 var(--mono); letter-spacing: 1px; text-transform: uppercase; color: var(--stone); }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--stone); }
+  .status.running i { background: var(--orange); animation: pulse 1.2s infinite; }
+  .status.done i { background: var(--orange); }
+  .status.failed i, .status.login_required i { background: var(--red); }
+  @keyframes pulse { 50% { opacity: .3; } }
+  @media (prefers-reduced-motion: reduce) { .status.running i { animation: none; } }
+  .clock { font: 500 13px var(--mono); color: var(--stone); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 14px; }
+  .tile { position: relative; background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; transition: border-color .2s; }
+  .tile.winner { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+  .tile .n { font: 800 13px var(--display); color: var(--stone); }
+  .tile .strategy { font-size: 14px; min-height: 2.6em; }
+  .tile .state { display: flex; justify-content: space-between; align-items: center; font: 500 12px var(--mono); color: var(--stone); }
+  .tile .state b { font-weight: 600; color: var(--ink); }
+  .tile.reached .state b { color: var(--orange-ink); }
+  .tile.gave_up .state b, .tile.error .state b, .tile.login_required .state b, .tile.blocked .state b { color: var(--red-ink); }
+  .tile .state span { white-space: nowrap; }
+  .tile .state { gap: 10px; }
+  .bar { height: 4px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--orange); transition: width .6s; }
+  .tile.running .bar i { width: 60%; animation: slide 1.6s linear infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(170%); } }
+  @media (prefers-reduced-motion: reduce) { .tile.running .bar i { animation: none; width: 50%; } }
+  .tile.done .bar i { width: 100%; }
+  .tile.gave_up .bar i, .tile.error .bar i { background: var(--red); }
+  /* The agent said it reached the goal; the judge's screenshots say otherwise. */
+  .tile.disputed .bar i { background: repeating-linear-gradient(135deg, var(--red) 0 6px, #F2B8B5 6px 12px); }
+  .tile.disputed .state b { color: #B3261E; }
+  .trail { display: grid; gap: 4px; font-size: 13px; padding-left: 18px; margin: 0; }
+  .trail li::marker { color: var(--stone); font: 600 12px var(--mono); }
+  .crown { position: absolute; top: -10px; right: 12px; font: 600 10px/1 var(--mono); letter-spacing: 1.5px; text-transform: uppercase; background: var(--orange-ink); color: var(--white); border-radius: 99px; padding: 5px 9px; }
+  .evals { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ev { font: 500 11px/1 var(--mono); border: 1px solid var(--line); border-radius: 99px; padding: 4px 8px; color: var(--stone); background: var(--white); cursor: help; }
+  .ev.pass { color: var(--orange-ink); border-color: var(--orange-soft); background: var(--orange-soft); }
+  .ev.fail { color: var(--red-ink); border-color: #F5D5D1; background: #FBECEA; }
+  .ev.pending { border-style: dashed; }
+  .tile .trace-btn { justify-self: start; font: 500 12px var(--body); color: var(--stone); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .tile .trace-btn:hover { color: var(--ink); }
+  .result { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 18px 20px; }
+  .result h2 { color: var(--paper); }
+  .result p { margin: 4px 0 0; color: #A3A3A3; font-size: 14px; }
+  .result .btn:not(.secondary) { background: var(--orange); color: var(--ink); }
+  .result .btn:not(.secondary):hover { background: #3ECF8E; }
+  .result.bad { background: var(--white); color: var(--ink); border: 1px solid var(--line); }
+  .result.bad h2 { color: var(--ink); }
+  .result.bad p { color: var(--stone); }
+  /* trace drawer */
+  .drawer { position: fixed; inset: 0; background: rgba(23,24,28,.45); display: none; align-items: stretch; justify-content: flex-end; z-index: 10; }
+  .drawer.open { display: flex; }
+  .drawer .panel { width: min(680px, 100%); background: var(--paper); overflow: auto; padding: 24px 20px 40px; display: grid; gap: 14px; align-content: start; }
+  .drawer .close { justify-self: end; }
+  .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); }
+  .tabs button { font: 600 13px var(--body); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; margin-bottom: -1px; color: var(--stone); cursor: pointer; }
+  .tabs button.on { color: var(--ink); border-bottom-color: var(--orange); }
+  .tabs button:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .film { display: grid; gap: 10px; }
+  .cmds { display: grid; gap: 8px; }
+  .film .stage { position: relative; background: var(--white); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .film .stage img { display: block; width: 100%; height: auto; }
+  .film .cap { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 14px; }
+  .film .cap b { font-weight: 600; }
+  .film .cap .u { font: 500 12px var(--mono); color: var(--stone); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
+  .film .ctl { display: flex; gap: 8px; align-items: center; }
+  .film .ctl .n { font: 500 12px var(--mono); color: var(--stone); margin-left: auto; }
+  .film .thumbs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+  .film .thumbs button { flex: none; width: 88px; padding: 0; border: 2px solid transparent; border-radius: 6px; background: none; cursor: pointer; overflow: hidden; }
+  .film .thumbs button.on { border-color: var(--orange); }
+  .film .thumbs img { display: block; width: 100%; height: auto; }
+  .film .kind { font: 600 10px/1 var(--mono); letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange-ink); }
+  .film .kind.back { color: var(--red-ink); }
+  .cmd { background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 6px; }
+  .cmd .c { font: 500 12.5px var(--mono); color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+  .cmd .o { font: 12px var(--mono); color: var(--stone); white-space: pre-wrap; word-break: break-word; max-height: 140px; overflow: auto; }
+  .cmd .o.fail { color: var(--red); }
+  .live-shot { width: 100%; border-radius: 8px; border: 1px solid var(--line); margin-top: 2px; aspect-ratio: 1280 / 900; object-fit: cover; object-position: top; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="nav">
+    <a class="brand" href="/ask" aria-label="Corgi Brain"><span class="wordmark">Corgi <b>Brain</b></span></a>
+    <a href="/ask">Ask</a>
+    <a href="/recorded">Recorded</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <span class="nav-group">Agents</span>
+    <a href="/discovered">Discovered</a>
+    <a href="/explore" class="on" aria-current="page">Explore</a>
+    <a href="/replays">Replays</a>
+    <a href="/history">History</a>
+  </nav>
+  <header class="head">
+    <div class="kicker" id="site">Exploring</div>
+    <h1 id="goal">…</h1>
+    <div style="display:flex;gap:8px 16px;align-items:center;flex-wrap:wrap;margin-top:6px"><span class="status" id="status" aria-live="polite"><i></i><span>starting</span></span><span class="clock" id="clock"></span><span class="clock" id="cost" title="Claude tokens spent by every agent and the judge"></span><span class="clock" id="live" title="Updates stream from live updates"></span></div>
+  </header>
+  <div id="result" hidden></div>
+  <section class="tiles" id="tiles"></section>
+  <p class="muted" style="font-size:13px;margin:0">Each tile is one Claude agent driving its own browser. Every step streams in live from live updates. Agents stop at any sign-in wall and never create accounts.</p>
+</main>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="panel">
+    <button class="btn secondary close" id="drawer-close" type="button">Close</button>
+    <div><div class="kicker">Trace</div><h2 id="drawer-title">Agent</h2><p class="muted" id="drawer-sub" style="margin:4px 0 0;font-size:14px"></p></div>
+    <div class="tabs" id="drawer-tabs" role="tablist" hidden><button type="button" role="tab" data-tab="frames">Frames</button><button type="button" role="tab" data-tab="commands">Commands</button></div>
+    <div id="drawer-body" style="display:grid;gap:8px"></div>
+  </div>
+</div>
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const id = location.pathname.split("/").pop();
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let ex = null, t0 = null;
+
+  const label = (a) => {
+    if (a.status === "queued") return "opening a browser";
+    if (a.status === "running") return a.trace && a.trace.length ? `exploring · ${a.trace[a.trace.length - 1].name}` : "exploring";
+    if (a.status === "recovering") return "asking for its trail";
+    if (a.status === "wrapping up") return "out of time, wrapping up";
+    if (a.status === "error") return "error";
+    if (a.outcome === "reached" && a.judgeSays === false) return "claimed success · judge disagrees";
+    return { reached: "reached the goal", gave_up: "gave up", login_required: "hit a login wall", blocked: "blocked by bot protection" }[a.outcome] || a.outcome || "done";
+  };
+
+  const EVAL_LABEL = { "reached-goal": "goal", "clean-instructions": "instructions", "no-wasted-actions": "directness" };
+  function evalRow(a) {
+    if (a.status !== "done") return "";
+    const have = a.evals || [];
+    if (!have.length) return ex.status === "judging" ? '<div class="evals"><span class="ev pending" title="Claude Opus judges each run from its screenshots">judging…</span></div>' : "";
+    return `<div class="evals">${have.map((e) => {
+      const name = EVAL_LABEL[e.slug] || e.slug;
+      const val = e.rating != null ? `${e.rating}/5` : e.passed === true ? "✓" : e.passed === false ? "✗" : "?";
+      const cls = e.rating != null ? (e.rating >= 4 ? "pass" : e.rating <= 2 ? "fail" : "") : e.passed ? "pass" : e.passed === false ? "fail" : "";
+      return `<span class="ev ${cls}" title="${esc(e.reasoning || "")}">${esc(name)} ${val}</span>`;
+    }).join("")}</div>`;
+  }
+
+  function render() {
+    $("goal").textContent = ex.goal[0].toUpperCase() + ex.goal.slice(1);
+    $("site").textContent = `Exploring · ${(() => { try { return new URL(ex.url).hostname; } catch { return ex.url; } })()}`;
+    const st = $("status"); st.className = `status ${ex.status}`; st.querySelector("span").textContent = { running: "agents exploring", judging: "judging the runs", done: "path found", failed: "no path found", login_required: "blocked by a login", blocked: "blocked by bot protection", stale: "interrupted" }[ex.status] || ex.status;
+    $("tiles").innerHTML = ex.agents.map((a) => {
+      const win = ex.winner && ex.winner.agent === a.i;
+      const cls = `tile ${a.status} ${a.outcome || ""} ${a.judgeSays === false ? "disputed" : ""} ${win ? "winner" : ""}`;
+      const steps = a.trail && a.trail.length ? `<ol class="trail">${a.trail.map((s) => `<li>${esc(s.instruction)}</li>`).join("")}</ol>` : "";
+      const shot = a.status === "running" && a.frames && a.frames.length ? `<img class="live-shot" src="${esc(a.frames[a.frames.length - 1].src)}" alt="What agent ${a.i + 1} sees now">` : "";
+      return `<article class="${cls}">${win ? '<span class="crown">Shortest path</span>' : ""}
+        <div class="n">Agent ${a.i + 1}</div>
+        <div class="strategy">${esc(a.strategy)}</div>
+        <div class="bar"><i></i></div>
+        <div class="state"><b>${esc(label(a))}</b><span>${a.steps != null ? `${a.steps} step${a.steps === 1 ? "" : "s"}${a.deadEnds ? ` · ${a.deadEnds} dead end${a.deadEnds === 1 ? "" : "s"}` : ""}` : ""}</span></div>
+        ${shot}
+        ${steps}
+        ${evalRow(a)}
+        ${a.frames && a.frames.length ? `<button class="trace-btn" type="button" data-trace="${a.i}">Watch what it did (${a.frames.length} frames)</button>` : a.trace && a.trace.length ? `<button class="trace-btn" type="button" data-trace="${a.i}">See what it did (${a.trace.length} commands)</button>` : ""}
+      </article>`;
+    }).join("");
+    document.querySelectorAll("[data-trace]").forEach((b) => b.addEventListener("click", () => openTrace(ex.agents[Number(b.dataset.trace)])));
+    const r = $("result");
+    if (ex.status === "done" && ex.winner) {
+      r.hidden = false; r.className = "result";
+      const w = ex.agents[ex.winner.agent];
+      r.innerHTML = `<div><h2>Agent ${w.i + 1} found it in ${w.steps} step${w.steps === 1 ? "" : "s"}</h2><p>Saved to the library. Guide me walks you through the same path in your own browser.</p></div><a class="btn" href="/guide/${esc(ex.winner.workflowId)}">Guide me</a>`;
+    } else if (ex.status === "failed" || ex.status === "login_required" || ex.status === "blocked") {
+      r.hidden = false; r.className = "result bad";
+      const copy = { login_required: ["The goal is behind a login", "Agents never sign in. Record this one yourself with the extension, in your own logged-in browser."], blocked: ["The site blocks automated browsers", "Its bot protection turned the agents away at the door. Record this one yourself with the extension; your own browser is welcome there."] }[ex.status] || ["No agent reached the goal", "Try rewording the goal, starting from a deeper page, or sending more agents."];
+      r.innerHTML = `<div><h2>${copy[0]}</h2><p>${copy[1]}</p></div><a class="btn secondary" href="/explore">Try again</a>`;
+    } else { r.hidden = true; }
+  }
+
+  function openTrace(a) {
+    $("drawer-title").textContent = `Agent ${a.i + 1}`;
+    $("drawer-sub").textContent = `${a.strategy} · ${label(a)}`;
+    $("drawer-tabs").hidden = true;
+    if (a.frames && a.frames.length) renderFilm(a); else
+    $("drawer-body").innerHTML = (a.trace || []).map((c) => `<div class="cmd"><div class="c">$ ${esc(c.cmd)}</div>${c.out ? `<div class="o ${c.ok === "fail" ? "fail" : ""}">${esc(c.out)}</div>` : ""}</div>`).join("") || '<span class="muted">No commands recorded.</span>';
+    $("drawer").classList.add("open");
+    lastFocus = document.activeElement;
+    $("drawer-close").focus();
+  }
+  // Filmstrip: one frame per action the agent took, with the instruction it recorded.
+  let film = { frames: [], i: 0, timer: null };
+  const cmdList = (a) => (a.trace || []).map((c) => `<div class="cmd"><div class="c">$ ${esc(c.cmd)}</div>${c.out ? `<div class="o ${c.ok === "fail" ? "fail" : ""}">${esc(c.out)}</div>` : ""}</div>`).join("") || '<span class="muted">No commands recorded.</span>';
+  function showTab(name) {
+    const film = document.querySelector("#drawer-body .film"), cmds = $("cmds");
+    if (!film || !cmds) return;
+    film.hidden = name !== "frames"; cmds.hidden = name !== "commands";
+    $("drawer-tabs").querySelectorAll("button").forEach((b) => { b.classList.toggle("on", b.dataset.tab === name); b.setAttribute("aria-selected", String(b.dataset.tab === name)); });
+    if (name !== "frames") stopFilm();
+  }
+  function renderFilm(a) {
+    film = { frames: a.frames, i: 0, timer: null };
+    $("drawer-body").innerHTML = `<div class="film">
+      <div class="stage"><img id="film-img" alt="Screenshot of this step"></div>
+      <div class="cap"><span><span class="kind" id="film-kind"></span> <b id="film-cap"></b></span><span class="u" id="film-url"></span></div>
+      <div class="ctl"><button class="btn secondary" type="button" id="film-prev" aria-label="Previous frame">←</button><button class="btn secondary" type="button" id="film-play">Play</button><button class="btn secondary" type="button" id="film-next" aria-label="Next frame">→</button><span class="n" id="film-n"></span></div>
+      <div class="thumbs" id="film-thumbs">${a.frames.map((f, i) => `<button type="button" data-i="${i}" title="${esc(f.instruction || f.cmd)}"><img src="${esc(f.src)}" alt="" loading="lazy"></button>`).join("")}</div>
+    </div>
+    <div id="cmds" class="cmds" hidden>${cmdList(a)}</div>`;
+    const tabs = $("drawer-tabs"); tabs.hidden = false;
+    tabs.querySelector('[data-tab="frames"]').textContent = `Frames (${a.frames.length})`;
+    tabs.querySelector('[data-tab="commands"]').textContent = `Commands (${(a.trace || []).length})`;
+    tabs.querySelectorAll("button").forEach((b) => { b.classList.toggle("on", b.dataset.tab === "frames"); b.setAttribute("aria-selected", String(b.dataset.tab === "frames")); b.onclick = () => showTab(b.dataset.tab); });
+    $("film-prev").onclick = () => showFrame(film.i - 1);
+    $("film-next").onclick = () => showFrame(film.i + 1);
+    $("film-play").onclick = () => film.timer ? stopFilm() : playFilm();
+    $("film-thumbs").querySelectorAll("button").forEach((b) => b.onclick = () => showFrame(Number(b.dataset.i)));
+    showFrame(0);
+  }
+  function showFrame(i) {
+    if (!film.frames.length) return;
+    film.i = (i + film.frames.length) % film.frames.length;
+    const f = film.frames[film.i];
+    $("film-img").src = f.src;
+    $("film-kind").textContent = f.cmd; $("film-kind").className = `kind ${f.cmd === "back" ? "back" : ""}`;
+    $("film-cap").textContent = f.instruction || "";
+    $("film-url").textContent = f.url || ""; $("film-url").title = f.url || "";
+    $("film-n").textContent = `${film.i + 1} / ${film.frames.length}`;
+    $("film-thumbs").querySelectorAll("button").forEach((b, n) => { b.classList.toggle("on", n === film.i); if (n === film.i) b.scrollIntoView({ block: "nearest", inline: "nearest" }); });
+  }
+  function playFilm() { $("film-play").textContent = "Pause"; film.timer = setInterval(() => { if (film.i === film.frames.length - 1) return stopFilm(); showFrame(film.i + 1); }, 1400); }
+  function stopFilm() { clearInterval(film.timer); film.timer = null; if ($("film-play")) $("film-play").textContent = "Play"; }
+  document.addEventListener("keydown", (e) => { if (!$("drawer").classList.contains("open") || !film.frames.length) return; if (e.key === "ArrowRight") showFrame(film.i + 1); if (e.key === "ArrowLeft") showFrame(film.i - 1); });
+  let lastFocus = null;
+  const closeDrawer = () => { stopFilm(); $("drawer").classList.remove("open"); lastFocus?.focus?.(); };
+  $("drawer-close").addEventListener("click", closeDrawer);
+  $("drawer").addEventListener("click", (e) => { if (e.target === $("drawer")) closeDrawer(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("drawer").classList.contains("open")) closeDrawer(); });
+
+  // Live updates: load the exploration once, then live updates pushes every save the
+  // bridge makes (each agent step, screenshot, verdict). A slow poll covers a dropped socket.
+  const accept = (next) => {
+    if (!next || (ex && next.updatedAt && ex.updatedAt && next.updatedAt < ex.updatedAt)) return;
+    ex = next; if (!t0) t0 = new Date(ex.startedAt).getTime(); render();
+    $("cost").textContent = ex.cost ? `$${Number(ex.cost).toFixed(3)}` : "";
+  };
+  async function load() {
+    try {
+      const r = await fetch(`/explorations/${id}`);
+      if (r.status === 404) { $("goal").textContent = "Exploration not found."; return false; }
+      if (r.ok) accept(await r.json());
+    } catch { /* transient */ }
+    return true;
+  }
+  load().then((found) => {
+    if (!found) return;
+    const sb = supabase.createClient(window.SUPA.url, window.SUPA.anonKey);
+    sb.channel(`exploration:${id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "explorations", filter: `id=eq.${id}` }, (msg) => accept(msg.new && msg.new.doc))
+      .subscribe((status) => { $("live").textContent = status === "SUBSCRIBED" ? "● live" : ""; });
+    setInterval(() => { if (ex && ["running", "judging"].includes(ex.status)) load(); }, 15000);
+  });
+  setInterval(() => { if (!ex) return; const end = ex.finishedAt ? new Date(ex.finishedAt).getTime() : Date.now(); const s = Math.max(0, Math.round((end - t0) / 1000)); $("clock").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 500);
+</script>
+</body>
+</html>

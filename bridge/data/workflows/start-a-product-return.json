@@ -1,0 +1,50 @@
+{
+  "id": "start-a-product-return",
+  "task": "Start a product return",
+  "site": "amazon.com",
+  "startUrl": "https://www.amazon.com/",
+  "taughtBy": "human",
+  "recordedBy": "maya",
+  "recordedAt": "2026-09-29T00:29:52.633Z",
+  "synonyms": "make a return, return an item, request a refund, start a return request",
+  "cleanedBy": "claude",
+  "rawEventCount": 2,
+  "trail": [
+    {
+      "n": 1,
+      "kind": "click",
+      "instruction": "Click 'Returns' from the homepage.",
+      "target": {
+        "tag": "a",
+        "text": "returns"
+      },
+      "fid": "fp:a::Returns",
+      "label": "Returns",
+      "url": "/"
+    },
+    {
+      "n": 2,
+      "kind": "verify",
+      "instruction": "You land on the Your Returns page where you can begin the return process.",
+      "textIncludes": "Your Returns"
+    }
+  ],
+  "rawEvents": [
+    {
+      "fid": "fp:a::Returns",
+      "kind": "click",
+      "label": "Returns",
+      "t": 1790641785289,
+      "target": {
+        "tag": "a",
+        "text": "returns"
+      },
+      "url": "/"
+    },
+    {
+      "kind": "nav",
+      "t": 1790641785609,
+      "url": "/your-returns"
+    }
+  ]
+}

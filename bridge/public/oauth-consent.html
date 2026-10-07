@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect an agent · Corgi Brain</title>
+<link rel="icon" href="/assets/icons/icon-32.png">
+<link rel="stylesheet" href="/bb.css">
+<style>
+  main { max-width: 520px; }
+  .box { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 14px; }
+  .box h1 { font-size: 30px; }
+  .client { display: flex; gap: 12px; align-items: center; }
+  .client .logo { width: 44px; height: 44px; border-radius: 12px; background: var(--ink); color: #3ECF8E; display: grid; place-items: center; font: 700 15px/1 var(--mono); flex: none; }
+  .client b { font-size: 17px; }
+  ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14.5px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  input[type=email] { font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; width: 100%; }
+  .muted { color: var(--stone); font-size: 13.5px; margin: 0; }
+  .err { color: #B3261E; font-size: 14px; margin: 0; }
+  code { font-family: var(--mono); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="nav"><a class="brand" href="/ask" aria-label="Corgi Brain"><span class="wordmark">Corgi <b>Brain</b></span></a></nav>
+  <section class="box" id="box" aria-live="polite"><p class="muted">Loading…</p></section>
+</main>
+<script src="/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // The OAuth 2.1 server sends MCP clients (Claude Code, Claude.ai, ChatGPT…) here with
+  // ?authorization_id=…. The person signs in, sees which agent is asking, and
+  // approves or denies. Every tool call that agent makes then runs as this user, under RLS.
+  const box = document.getElementById("box");
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const sb = supabase.createClient(window.SUPA.url, window.SUPA.anonKey);
+  const authorizationId = new URLSearchParams(location.search).get("authorization_id");
+  const go = (data) => { const to = data && (data.redirect_url || data.redirect_to || data.url); if (to) location.href = to; else box.innerHTML = '<h1>Done</h1><p class="muted">You can close this tab and go back to your agent.</p>'; };
+
+  function signIn() {
+    box.innerHTML = `<h1>Sign in to connect your agent</h1>
+      <p class="muted">An agent wants to use your team's Corgi Brain. Sign in with your work email; we'll send a one-time sign-in link.</p>
+      <form id="f" class="row"><input type="email" id="email" required placeholder="you@company.com" autocomplete="email"><button class="btn" type="submit">Email me a link</button></form>
+      <p class="err" id="err" hidden></p>`;
+    document.getElementById("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href } });
+      if (error) { const el = document.getElementById("err"); el.hidden = false; el.textContent = error.message; return; }
+      box.innerHTML = `<h1>Check your email</h1><p class="muted">Open the link we sent to <b>${esc(email)}</b> in this browser. It brings you back here to approve the agent.</p>`;
+    });
+  }
+
+  async function consent(session) {
+    const { data, error } = await sb.auth.oauth.getAuthorizationDetails(authorizationId);
+    if (error) { box.innerHTML = `<h1>This request can't be used</h1><p class="err">${esc(error.message)}</p><p class="muted">Start the connection again from your agent.</p>`; return; }
+    // Already approved before: the server answers with where to send the browser.
+    if (data && (data.redirect_url || data.redirect_to) && !data.client) return go(data);
+    const client = data.client || {};
+    const name = client.name || client.client_name || "An agent";
+    const scopes = String(data.scope || data.scopes || "").split(/[ ,]+/).filter(Boolean);
+    box.innerHTML = `<div class="client"><span class="logo">AI</span><div><b>${esc(name)}</b><p class="muted">wants to use Corgi Brain as ${esc(session.user.email)}</p></div></div>
+      <h1>Connect this agent?</h1>
+      <ul>
+        <li>Ask the team's brain how things are done and read its workflows</li>
+        <li>Run saved workflows in a headless browser</li>
+        <li>Send agents to explore public sites</li>
+      </ul>
+      <p class="muted">It acts as you, so it only sees what you can see.${scopes.length ? ` Scopes: <code>${esc(scopes.join(" "))}</code>.` : ""}${data.redirect_uri ? ` Returns to <code>${esc(data.redirect_uri)}</code>.` : ""}</p>
+      <div class="row"><button class="btn" id="yes" type="button">Approve</button><button class="btn secondary" id="no" type="button">Deny</button></div>
+      <p class="muted">Not you? <a href="#" id="out">Use another account</a></p>`;
+    document.getElementById("yes").onclick = async () => { const r = await sb.auth.oauth.approveAuthorization(authorizationId); r.error ? alert(r.error.message) : go(r.data); };
+    document.getElementById("no").onclick = async () => { const r = await sb.auth.oauth.denyAuthorization(authorizationId); r.error ? alert(r.error.message) : go(r.data); };
+    document.getElementById("out").onclick = async (e) => { e.preventDefault(); await sb.auth.signOut(); signIn(); };
+  }
+
+  (async () => {
+    if (!authorizationId) { box.innerHTML = '<h1>Connect an agent</h1><p class="muted">Add <code>/functions/v1/mcp</code> as a remote MCP server in your agent. It will send you here to sign in and approve it.</p>'; return; }
+    const { data: { session } } = await sb.auth.getSession();
+    session ? consent(session) : signIn();
+    sb.auth.onAuthStateChange((event, s) => { if (event === "SIGNED_IN" && s) consent(s); });
+  })();
+</script>
+</body>
+</html>
