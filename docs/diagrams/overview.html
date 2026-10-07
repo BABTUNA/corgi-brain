@@ -1,0 +1,48 @@
+<!doctype html>
+<!-- Corgi Brain, simple architecture. Hand-laid SVG; render with: bash render.sh -->
+<html lang="en"><head><meta charset="utf-8"><title>Corgi Brain overview</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,800&family=Onest:wght@400;500&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  html,body{margin:0;background:#FAF7F2}
+  svg{display:block}
+  .t{font:800 22px Archivo,sans-serif;fill:#1E1B18;letter-spacing:-.02em;text-anchor:middle}
+  .s{font:400 15px Onest,sans-serif;fill:#6E665E;text-anchor:middle}
+  .l{font:500 13px "JetBrains Mono",monospace;fill:#6E665E}
+  .box{fill:#fff;stroke:#1E1B18;stroke-width:2}
+  .ext{fill:#FAF7F2;stroke:#9A9087;stroke-width:1.5;stroke-dasharray:6 5}
+  .a{stroke:#1E1B18;stroke-width:2;fill:none}
+</style></head><body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1560" height="760" viewBox="0 0 1560 760">
+  <defs><marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#1E1B18"/></marker></defs>
+
+  <image href="../../assets/logo/corgibrain-mark.svg" x="36" y="26" width="64" height="64"/>
+  <text x="108" y="70" style="font:800 30px Archivo,sans-serif;letter-spacing:-.03em" fill="#1E1B18">Corgi Brain <tspan fill="#A34F1A">architecture</tspan></text>
+
+  <!-- top row -->
+  <rect class="box" x="180" y="130" width="300" height="90" rx="12"/>
+  <text class="t" x="330" y="169">Your team</text><text class="s" x="330" y="195">Chrome extension · Ask room</text>
+  <rect class="ext" x="630" y="130" width="300" height="90" rx="12"/>
+  <text class="t" x="780" y="169">AI agents</text><text class="s" x="780" y="195">Claude.ai · Claude Code · MCP</text>
+  <rect x="1080" y="130" width="300" height="90" rx="12" fill="#1E1B18"/>
+  <text class="t" x="1230" y="169" style="fill:#FFF6EA">Agent37</text><text class="s" x="1230" y="195" style="fill:#F6C9A0">brain keeper · nightly cron</text>
+
+  <!-- core -->
+  <rect x="180" y="320" width="1200" height="170" rx="16" fill="#E8873A" stroke="#1E1B18" stroke-width="2"/>
+  <text class="t" x="780" y="382" style="font-size:30px">Corgi Brain</text>
+  <text class="s" x="780" y="414" style="fill:#1E1B18;font-weight:500;font-size:16px">team workflows · ask by meaning · Guide me · replay · self-heal</text>
+  <text class="s" x="780" y="452" style="fill:#1E1B18;font-size:14px">on Supabase: Postgres + vectors · Compute · Edge Functions · Auth · Realtime · Storage</text>
+
+  <!-- bottom row -->
+  <rect class="ext" x="310" y="590" width="340" height="90" rx="12"/>
+  <text class="t" x="480" y="629">Claude API</text><text class="s" x="480" y="655">Sonnet 5.5 agents · Opus 5.5 judge</text>
+  <rect class="ext" x="910" y="590" width="340" height="90" rx="12"/>
+  <text class="t" x="1080" y="629">Web apps</text><text class="s" x="1080" y="655">headless browsers, no logins</text>
+
+  <!-- arrows -->
+  <path class="a" d="M330 220V318" marker-end="url(#h)"/><text class="l" x="342" y="274">record · ask · guide</text>
+  <path class="a" d="M780 220V318" marker-end="url(#h)"/><text class="l" x="792" y="274">MCP tools</text>
+  <path class="a" d="M1230 220V318" marker-end="url(#h)"/><text class="l" x="1242" y="274">every night: check · heal · report</text>
+  <path class="a" d="M480 490V588" marker-end="url(#h)"/><text class="l" x="492" y="544">prompts + screenshots</text>
+  <path class="a" d="M1080 490V588" marker-end="url(#h)"/><text class="l" x="1092" y="544">explore · replay</text>
+</svg>
+</body></html>

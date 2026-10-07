@@ -6,6 +6,10 @@ Every team has workflows that live in someone's head: how to add a GitHub secret
 
 **Try it:** [Ask room](https://vwnptwlibsllqexidmrj.supabase.co/compute/v1/bridge/ask) · [Discovered](https://vwnptwlibsllqexidmrj.supabase.co/compute/v1/bridge/discovered) · [Replays](https://vwnptwlibsllqexidmrj.supabase.co/compute/v1/bridge/replays)
 
+## Architecture
+
+<p align="center"><img src="docs/diagrams/overview.png" alt="Corgi Brain architecture: your team, AI agents and the Agent37 brain keeper use Corgi Brain on Supabase, which calls the Claude API and drives headless browsers on web apps" width="100%"></p>
+
 ## The workflow it replaces
 
 Checking that your team's how-to guides still work. Websites change, steps break, and someone has to notice. Corgi Brain's keeper agent does it every night instead.
