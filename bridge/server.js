@@ -299,7 +299,7 @@ const PAGES = {
 const nav = (on) => {
   const a = (href, key, label) => `<a href="${href}"${on === key ? ' class="on" aria-current="page"' : ""}>${label}</a>`;
   return `<nav class="nav">
-    <a class="brand" href="/ask" aria-label="Corgi Brain"><span class="wordmark">Corgi <b>Brain</b></span></a>
+    <a class="brand" href="/ask" aria-label="Corgi Brain"><img src="/assets/logo/corgibrain-wordmark.svg" alt="Corgi Brain"></a>
     ${a("/ask", "ask", "Ask")}
     ${a("/recorded", "recorded", "Recorded")}
     <span class="nav-sep" aria-hidden="true"></span>

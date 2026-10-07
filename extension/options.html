@@ -5,7 +5,7 @@
   <title>Corgi Brain settings</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,800&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap');
-    :root { --orange:#E8873A; --orange-light:#CF7128; --orange-deep:#CF7128; --white:#FFFFFF; --paper:#FAF7F2; --ink:#1E1B18; --stone:#6E665E; --line:#EAE3D9;
+    :root { --orange:#E8873A; --orange-ink:#A34F1A; --orange-ink-deep:#8A4115; --orange-light:#CF7128; --orange-deep:#CF7128; --white:#FFFFFF; --paper:#FAF7F2; --ink:#1E1B18; --stone:#6E665E; --line:#EAE3D9;
       --display:"Archivo","Archivo Black","Arial Black",sans-serif; --body:"Onest",-apple-system,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.55 var(--body); padding: 40px 16px; }
@@ -21,8 +21,8 @@
     input:focus { outline: none; border-color: var(--ink); }
     .hint { color: var(--stone); font-size: 13px; }
     code { font: 12px var(--mono); background: var(--paper); padding: 1px 5px; border-radius: 4px; }
-    button { justify-self: start; font: 600 14px/1 var(--body); background: var(--orange); color: var(--white); border: 0; border-radius: 8px; min-height: 44px; padding: 0 20px; cursor: pointer; }
-    button:hover { background: var(--orange-light); }
+    button { justify-self: start; font: 600 14px/1 var(--body); background: var(--orange); color: var(--white); border: 0; border-radius: 8px; min-height: 44px; padding: 0 20px; cursor: pointer; background: var(--orange-ink); }
+    button:hover { background: var(--orange-ink-deep); }
     button:active { background: var(--orange-deep); }
     button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
     .status { min-height: 1.5em; color: var(--stone); }
@@ -31,7 +31,7 @@
 </head>
 <body>
   <main>
-    <div class="brand"><span style="font:800 18px/1 Archivo,Arial,sans-serif;letter-spacing:-.03em;color:#1E1B18"><img src="icons/icon-48.png" alt="" width="22" height="22" style="vertical-align:-5px;margin-right:6px;border-radius:5px">Corgi <b style="color:#E8873A">Brain</b></span></div>
+    <div class="brand"><img src="icons/wordmark.svg" alt="Corgi Brain"></div>
 
     <header>
       <div class="kicker">Settings</div>

@@ -47,7 +47,7 @@
   padding: 14px 18px 14px 16px;
   background: #1E1B18;
   color: #FFFFFF;
-  border: 1px solid #2E2E2E;
+  border: 1px solid #3A332D;
   border-left: 3px solid #E8873A;
   border-radius: 4px;
   font: 13px/1.45 'Onest', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -63,7 +63,7 @@
   font: 600 10px/1 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, monospace;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #5ED9A2;
+  color: #E8873A;
   margin-bottom: 6px;
 }
 
@@ -113,7 +113,7 @@
   padding: 10px 16px 10px 14px;
   background: #1E1B18;
   color: #FFFFFF;
-  border: 1px solid #2E2E2E;
+  border: 1px solid #3A332D;
   border-left: 3px solid #E8873A;
   border-radius: 4px;
   font: 500 12px/1 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, monospace;
@@ -184,7 +184,7 @@
   padding: 10px 8px 10px 18px;
   background: #1E1B18;
   color: #FFFFFF;
-  border: 1px solid #2E2E2E;
+  border: 1px solid #3A332D;
   border-radius: 999px;
   font: 500 12px/1 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, monospace;
   letter-spacing: 0.2px;
@@ -209,7 +209,7 @@
   font: 600 10px/1 'JetBrains Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: #5ED9A2;
+  color: #E8873A;
 }
 
 #__evernav_control__ .__evernav_control_task__ {
@@ -222,7 +222,7 @@
 
 #__evernav_control__ .__evernav_stop__ {
   background: transparent;
-  border: 1px solid #2E2E2E;
+  border: 1px solid #3A332D;
   color: #FFFFFF;
   font: 600 10px/1 'JetBrains Mono', monospace;
   text-transform: uppercase;
@@ -255,7 +255,7 @@
   padding: 12px 18px;
   background: #1E1B18;
   color: #FFFFFF;
-  border: 1px solid #2E2E2E;
+  border: 1px solid #3A332D;
   border-radius: 4px;
   font: 13px/1.45 'Onest', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   box-shadow:
@@ -270,7 +270,7 @@
 }
 
 #__evernav_user_message__.__evernav_level_warning__ {
-  border-left: 3px solid #5ED9A2;
+  border-left: 3px solid #E8873A;
 }
 
 #__evernav_user_message__.__evernav_level_info__ {

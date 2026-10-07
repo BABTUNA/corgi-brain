@@ -84,6 +84,8 @@
   .skill { font: 500 13px/1.2 var(--body); color: var(--orange-ink, #A34F1A); text-decoration: underline; text-underline-offset: 3px; }
   .skill::before { content: "✳ "; display: inline-block; margin-right: 2px; }
   .skill:hover { color: var(--ink); }
+  .av .mark { width: 26px; height: 26px; display: block; }
+  .av.brain { background: var(--orange-soft); }
 </style>
 </head>
 <body>
@@ -127,7 +129,7 @@
   let pending = null;
 
   const time = (t) => new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  const initials = (m) => m.author_kind === "brain" ? "SB" : m.author_kind === "agent" ? "AI" : esc(m.author.trim().slice(0, 2).toUpperCase() || "?");
+  const initials = (m) => m.author_kind === "brain" ? `<img src="${BASE}/assets/logo/corgibrain-mark.svg" alt="" class="mark">` : m.author_kind === "agent" ? "AI" : esc(m.author.trim().slice(0, 2).toUpperCase() || "?");
 
   function cardHtml(c) {
     return `<div class="wcard" data-id="${esc(c.id)}">
@@ -183,7 +185,7 @@
 
   function thinking(qid) {
     pending?.remove();
-    room.insertAdjacentHTML("beforeend", `<article class="msg thinking" data-for="${qid}"><div class="av brain">SB</div><div><div class="who">Corgi Brain</div><div class="body">Searching what the team knows…</div></div></article>`);
+    room.insertAdjacentHTML("beforeend", `<article class="msg thinking" data-for="${qid}"><div class="av brain"><img src="${BASE}/assets/logo/corgibrain-mark.svg" alt="" class="mark"></div><div><div class="who">Corgi Brain</div><div class="body">Searching what the team knows…</div></div></article>`);
     pending = room.lastElementChild;
     room.scrollTop = room.scrollHeight;
   }

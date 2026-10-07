@@ -23,9 +23,6 @@ a { color: var(--ink); text-underline-offset: 2px; }
 .nav a:hover, .nav a.on { color: var(--ink); }
 .nav a.on { border-bottom-color: var(--orange); }
 .nav .brand { margin-right: auto; text-decoration: none; }
-.wordmark { font: 800 21px/1 var(--display); letter-spacing: -0.03em; color: var(--ink); white-space: nowrap; }
-.wordmark b { color: var(--orange); font-weight: 800; }
-.wordmark::before { content: ""; display: inline-block; width: 28px; height: 28px; margin-right: 6px; vertical-align: -6px; background: url("assets/logo/corgibrain-mark.svg") center / contain no-repeat; }
 .nav-sep { width: 1px; height: 18px; background: var(--line); }
 .nav-group { font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--orange-ink); margin-right: -6px; }
 @media (max-width: 900px) { .nav { column-gap: 14px; } }

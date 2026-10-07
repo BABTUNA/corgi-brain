@@ -10,6 +10,8 @@
       --orange-light: #CF7128;
       --orange-deep: #CF7128;
       --orange-soft: #FCE6D2;
+      --orange-ink: #A34F1A;
+      --orange-ink-deep: #8A4115;
       --white: #FFFFFF;
       --paper: #FAF7F2;
       --ink: #1E1B18;
@@ -40,7 +42,7 @@
     .user-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 8px 12px; }
     .user-row .who { display: inline-flex; align-items: baseline; gap: 8px; }
     .user-badge { font: 600 12px/1 var(--mono); color: var(--ink); }
-    .kicker { font: 600 10px/1 var(--mono); letter-spacing: 1.6px; text-transform: uppercase; color: var(--orange); }
+    .kicker { font: 600 10px/1 var(--mono); letter-spacing: 1.6px; text-transform: uppercase; color: var(--orange-ink); }
 
 
     textarea {
@@ -60,9 +62,9 @@
     .actions { display: flex; gap: 8px; }
     button { font: 700 13px/1 var(--body); cursor: pointer; border-radius: 10px; min-height: 44px; }
     button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-    .primary { flex: 1; background: var(--orange); color: var(--white); border: 0; padding: 0 16px; }
-    .primary:hover { background: var(--orange-light); }
-    .primary:active { background: var(--orange-deep); }
+    .primary { flex: 1; background: var(--orange-ink); color: var(--white); border: 0; padding: 0 16px; }
+    .primary:hover { background: var(--orange-ink-deep); }
+    .primary:active { background: var(--orange-ink-deep); }
     .primary:disabled { opacity: 0.5; cursor: wait; }
     .secondary { background: var(--white); color: var(--ink); border: 1px solid var(--line); padding: 0 14px; }
     .secondary:hover { border-color: var(--ink); }
@@ -88,7 +90,7 @@
 </head>
 <body>
   <div class="head">
-    <div class="brand"><span style="font:800 18px/1 Archivo,Arial,sans-serif;letter-spacing:-.03em;color:#1E1B18"><img src="icons/icon-48.png" alt="" width="22" height="22" style="vertical-align:-5px;margin-right:6px;border-radius:5px">Corgi <b style="color:#E8873A">Brain</b></span></div>
+    <div class="brand"><img src="icons/wordmark.svg" alt="Corgi Brain"></div>
     <span class="host" id="wfSite"></span>
   </div>
 
