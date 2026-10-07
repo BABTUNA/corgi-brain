@@ -238,7 +238,7 @@ function renderOverlay(target, instruction, opts = {}) {
   const effectiveBg =
     pageBg && pageBg !== "rgba(0, 0, 0, 0)" && pageBg !== "transparent"
       ? pageBg
-      : getComputedStyle(document.documentElement).backgroundColor || "#F8F8F7";
+      : getComputedStyle(document.documentElement).backgroundColor || "#FAF7F2";
   clone.style.background = effectiveBg;
   clone.style.color = pageColor || "inherit";
   clone.innerHTML = target.outerHTML;
@@ -1026,14 +1026,14 @@ function toggleBigBadge() {
       right: "24px",
       zIndex: "2147483647",
       padding: "14px 24px",
-      background: "#3ECF8E",
+      background: "#E8873A",
       color: "#FFFFFF",
       font: "800 28px/1 'Archivo', 'Helvetica Neue', Arial, sans-serif",
       letterSpacing: "0.5px",
       textTransform: "uppercase",
       border: "1px solid #FFFFFF",
       borderRadius: "4px",
-      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35), 0 0 32px rgba(62, 207, 142, 0.35)",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35), 0 0 32px rgba(232, 135, 58, 0.35)",
       pointerEvents: "none",
     });
     bigBadgeEl.textContent = activeUser || "you";

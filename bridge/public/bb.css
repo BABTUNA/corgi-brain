@@ -1,10 +1,10 @@
 /* Corgi Brain pages: brand tokens (assets/brand.css) plus the shared page chrome. */
 @import url("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,800&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap");
 :root {
-  --ink: #171717; --orange: #24B47E; --orange-deep: #1A9466; --orange-soft: #D7F5E8;
-  /* Text-safe green: #24B47E is for fills, dots and borders; green text and white-on-green use this (5.3:1 on white, 4.6:1 on --orange-soft). */
-  --orange-ink: #127A54; --orange-ink-deep: #0E6243;
-  --paper: #F8F8F7; --white: #FFFFFF; --stone: #6B6B6B; --line: #E4E4E2; --red: #D93025; --red-ink: #B3261E;
+  --ink: #1E1B18; --orange: #E8873A; --orange-deep: #CF7128; --orange-soft: #FCE6D2;
+  /* Fawn #E8873A is for fills, dots, borders and the glow; orange text and white-on-orange use --orange-ink (5.7:1 on white, 4.7:1 on --orange-soft). */
+  --orange-ink: #A34F1A; --orange-ink-deep: #8A4115;
+  --paper: #FAF7F2; --white: #FFFFFF; --stone: #6E665E; --line: #EAE3D9; --red: #D93025; --red-ink: #B3261E;
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -25,7 +25,7 @@ a { color: var(--ink); text-underline-offset: 2px; }
 .nav .brand { margin-right: auto; text-decoration: none; }
 .wordmark { font: 800 21px/1 var(--display); letter-spacing: -0.03em; color: var(--ink); white-space: nowrap; }
 .wordmark b { color: var(--orange); font-weight: 800; }
-.wordmark::before { content: "🐶"; margin-right: 6px; font-size: 18px; }
+.wordmark::before { content: ""; display: inline-block; width: 28px; height: 28px; margin-right: 6px; vertical-align: -6px; background: url("assets/logo/corgibrain-mark.svg") center / contain no-repeat; }
 .nav-sep { width: 1px; height: 18px; background: var(--line); }
 .nav-group { font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--orange-ink); margin-right: -6px; }
 @media (max-width: 900px) { .nav { column-gap: 14px; } }

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Corgi Brain mark">
+  <!-- Single colour. Set color on the parent. -->
+  <defs><mask id="m3"><rect width="512" height="512" fill="#fff"/>
+    <circle cx="186" cy="306" r="16"/><circle cx="326" cy="306" r="16"/><path d="M230 358 Q256 344 282 358 Q278 384 256 390 Q234 384 230 358 Z"/></mask></defs>
+    <g mask="url(#m3)" fill="currentColor"><g stroke="currentColor" stroke-linejoin="round" stroke-width="28"><path d="M96 268 L150 72 L270 196 Z"/><path d="M416 268 L362 72 L242 196 Z"/></g><path d="M256 186 C150 186 76 236 76 316 C76 396 160 446 256 446 C352 446 436 396 436 316 C436 236 362 186 256 186 Z"/></g>
+</svg>

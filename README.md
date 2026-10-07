@@ -1,6 +1,6 @@
-# 🐶 Corgi Brain
+<p align="center"><img src="assets/banner/readme-banner.png" alt="Corgi Brain" width="100%"></p>
 
-**Your team's know-how for every web app, kept current by an agent.**
+<p align="center"><b>Your team's know-how for every web app, kept current by an agent.</b></p>
 
 Every team has workflows that live in someone's head: how to add a GitHub secret, where the billing settings are, how to start a return. Corgi Brain learns each one once, then people and agents can ask for it, get guided through it, or have it run for them. An **Agent37 agent** re-checks every workflow overnight, fixes the ones that broke, and posts a morning report, so nobody has to keep the docs up to date by hand.
 
@@ -72,3 +72,9 @@ supabase/    database migrations and edge functions
 ## Privacy
 
 Recordings keep labels and fingerprints, never typed values. Guide me never clicks for you. Agents have no credentials, stop at any login wall, and report bot walls instead of fighting them.
+
+## Brand
+
+Logo, icons, banners and slide-ready PNGs are in [`assets/`](assets/); the rules for using them, for people and agents, are in [STYLE.md](STYLE.md).
+
+<p align="center"><img src="assets/banner/logo-sheet.png" alt="Corgi Brain logo sheet" width="100%"></p>

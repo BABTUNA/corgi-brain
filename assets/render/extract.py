@@ -42,7 +42,7 @@ def run(text, size, gs=gs, cmap=cmap, hmtx=hmtx, kern=kern, upm=upm):
     return {'d': pen.getCommands(), 'bbox': {'x1':x1,'y1':y1,'x2':x2,'y2':y2}, 'adv': x*k}
 W = dict(gs=gsw, cmap=cmapw, hmtx=hmtxw, kern=kernw, upm=upmw)
 capB = run('B', 100, **W)['bbox']
-out = {'S': run('S',300), 'B': run('B',300), 'Supa': run('Supa',100, **W), 'Brain': run('Brain',100, **W),
+out = {'Corgi': run('Corgi',100, **W), 'Brain': run('Brain',100, **W),
        'space': hmtxw[cmapw[32]][0]*100/upmw, 'capH': capB['y2']-capB['y1'], 'wordFont': 'Archivo 800, width 100'}
 json.dump(out, open('paths.json','w'))
-print('S', out['S']['bbox'], 'B', out['B']['bbox'])
+print('ok', out['capH'])

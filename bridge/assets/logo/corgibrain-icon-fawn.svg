@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Corgi Brain">
+  <!-- App icon, fawn tile: cream corgi. -->
+  <rect width="512" height="512" rx="112" fill="#E8873A"/>
+  <g transform="translate(51.20 45.20) scale(0.8000)"><defs><clipPath id="h9"><path d="M256 186 C150 186 76 236 76 316 C76 396 160 446 256 446 C352 446 436 396 436 316 C436 236 362 186 256 186 Z"/></clipPath></defs>
+    <g stroke-linejoin="round" stroke-width="28">
+      <path d="M96 268 L150 72 L270 196 Z" fill="#FFF6EA" stroke="#FFF6EA"/>
+      <path d="M416 268 L362 72 L242 196 Z" fill="#FFF6EA" stroke="#FFF6EA"/>
+      <path d="M140 224 L162 124 L222 188 Z" fill="#F6C9A0" stroke="#F6C9A0" stroke-width="16"/>
+      <path d="M372 224 L350 124 L290 188 Z" fill="#F6C9A0" stroke="#F6C9A0" stroke-width="16"/>
+    </g>
+    <path d="M256 186 C150 186 76 236 76 316 C76 396 160 446 256 446 C352 446 436 396 436 316 C436 236 362 186 256 186 Z" fill="#FFF6EA"/>
+    <path clip-path="url(#h9)" d="M256 196 C240 196 236 250 226 300 C212 350 150 360 150 400 C150 432 200 456 256 456 C312 456 362 432 362 400 C362 360 300 350 286 300 C276 250 272 196 256 196 Z" fill="#FFFFFF"/>
+    <path d="M256 186 C150 186 76 236 76 316 C76 396 160 446 256 446 C352 446 436 396 436 316 C436 236 362 186 256 186 Z" fill="none" stroke="#FFF6EA" stroke-width="20"/>
+    <circle cx="186" cy="306" r="16" fill="#1E1B18"/><circle cx="326" cy="306" r="16" fill="#1E1B18"/>
+    <path d="M230 358 Q256 344 282 358 Q278 384 256 390 Q234 384 230 358 Z" fill="#1E1B18"/></g>
+</svg>
